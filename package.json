@@ -38,6 +38,7 @@
     "typescript": "^4.6.3"
   },
   "dependencies": {
+    "axios": "^0.26.1",
     "pito": "^0.0.2"
   }
 }
