@@ -11,8 +11,14 @@
     }
   },
   "files": [
-    "cjs",
-    "esm"
+    "cjs/**/*.d.ts",
+    "cjs/**/*.d.ts.map",
+    "cjs/**/*.js",
+    "cjs/**/*.js.map",
+    "esm/**/*.d.ts",
+    "esm/**/*.d.ts.map",
+    "esm/**/*.js",
+    "esm/**/*.js.map"
   ],
   "scripts": {
     "build": "npm run \"build:cjs\" & npm run \"build:esm\"",
@@ -38,7 +44,6 @@
     "typescript": "^4.6.3"
   },
   "dependencies": {
-    "axios": "^0.26.1",
     "pito": "^0.0.4"
   }
 }

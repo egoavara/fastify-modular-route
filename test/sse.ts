@@ -1,7 +1,6 @@
 import { pito } from 'pito'
 import tap from 'tap'
-import { HTTPNoBody } from '../cjs'
-
+import { SSE } from '../cjs'
 
 tap.test('builder', async t => {
     const header = pito.obj({
@@ -13,19 +12,17 @@ tap.test('builder', async t => {
     const param = pito.obj({
         c: pito.num()
     })
-    const res = pito.int()
-
-
-    const def = HTTPNoBody("GET", "/a/b/:c/d", 'Test')
+    const pack = pito.str()
+    const def = SSE("/a/b/:c/d", 'SSE')
         .withHeaders(header)
         .withParams(param)
         .withQuery(query)
-        .withResponse(res)
+        .withPacket(pack)
         .build()
 
     t.same(
         def.domain,
-        'Test',
+        'SSE',
     )
     t.same(
         pito.strict(def.headers),
@@ -40,14 +37,12 @@ tap.test('builder', async t => {
         pito.strict(query),
     )
     t.same(
-        pito.strict(def.response),
-        pito.strict(res),
+        pito.strict(def.packet),
+        pito.strict(pack),
     )
 })
-
-
-tap.test('builder no param', async t => {
-    const def = HTTPNoBody("GET", "/a/b/c/d").build()
+tap.test('builder other branch', async t => {
+    const def = SSE("/a/b/c/d").build()
 
     t.same(
         def.domain,

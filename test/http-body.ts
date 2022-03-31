@@ -3,7 +3,7 @@ import tap from 'tap'
 import { HTTPBody } from '../cjs'
 
 
-tap.test('with test', async t => {
+tap.test('builder', async t => {
     const header = pito.obj({
         Help: pito.regex('^Help [a-zA-Z_\-]+')
     })
@@ -17,7 +17,7 @@ tap.test('with test', async t => {
     const res = pito.int()
 
 
-    const def = HTTPBody("Test", "POST", "/a/b/:c/d")
+    const def = HTTPBody("POST", "/a/b/:c/d", 'Test')
         .withHeaders(header)
         .withParams(param)
         .withQuery(query)
@@ -48,5 +48,19 @@ tap.test('with test', async t => {
     t.same(
         pito.strict(def.response),
         pito.strict(res),
+    )
+})
+
+
+tap.test('builder no param', async t => {
+    const def = HTTPBody("POST", "/a/b/c/d").build()
+
+    t.same(
+        def.domain,
+        '',
+    )
+    t.same(
+        def.path,
+        '/a/b/c/d',
     )
 })

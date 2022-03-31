@@ -1,5 +1,5 @@
 import { pito } from "pito"
-import { AddPitoHeader, HeaderKeys, PitoHeader } from "./headers"
+import { PitoHeader } from "./headers"
 import { MethodHTTPBody } from "./methods"
 import { ParseRouteKeys } from "./utils"
 
@@ -8,7 +8,7 @@ export type HTTPBody
     Domain extends string,
     Method extends MethodHTTPBody,
     Path extends string,
-    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<any, any, { type: 'string' | 'number' | 'integer' | 'boolean' }, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<any, any, { type: 'string' | 'number' | 'integer' | 'boolean' }, any>>>,
+    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Headers extends PitoHeader = PitoHeader,
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Body extends pito = pito,
@@ -41,23 +41,19 @@ export type HTTPBodyBuilder
     Domain extends string,
     Method extends MethodHTTPBody,
     Path extends string,
-    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<any, any, { type: 'string' | 'number' | 'integer' | 'boolean' }, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<any, any, { type: 'string' | 'number' | 'integer' | 'boolean' }, any>>>,
-    Headers extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
+    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+    Headers extends PitoHeader = PitoHeader,
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Body extends pito = pito,
     Response extends pito = pito,
     > = {
         working: HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response>
         withParams
-            <NewParams extends pito.obj<Record<ParseRouteKeys<Path>, pito<any, any, { type: 'string' | 'number' | 'integer' | 'boolean' }, any>>>>
+            <NewParams extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : HTTPBodyBuilder<Domain, Method, Path, NewParams, Headers, Query, Body, Response>
-        addHeaders
-            <HKey extends HeaderKeys, HVal extends pito>
-            (key: HKey, val: HVal)
-            : HTTPBodyBuilder<Domain, Method, Path, Params, AddPitoHeader<Headers, HKey, HVal>, Query, Body, Response>
         withHeaders
-            <NewHeaders extends pito.obj<Record<string, pito>>>
+            <NewHeaders extends PitoHeader>
             (headers: NewHeaders)
             : HTTPBodyBuilder<Domain, Method, Path, Params, NewHeaders, Query, Body, Response>
         withQuery
@@ -74,14 +70,16 @@ export type HTTPBodyBuilder
             : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, Body, NewResponse>
         build(): HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response>
     }
+
+
 export function HTTPBody
-    <Domain extends string, Method extends MethodHTTPBody, Path extends string>
-    (domain: Domain, method: Method, path: Path)
+    <Method extends MethodHTTPBody, Path extends string, Domain extends string = ''>
+    (method: Method, path: Path, domain?: Domain)
     : HTTPBodyBuilder<
         Domain,
         Method,
         Path,
-        pito.obj<Record<ParseRouteKeys<Path>, pito<any, any, { type: 'string' | 'number' | 'integer' | 'boolean' }, any>>>,
+        pito.obj<Record<ParseRouteKeys<Path>, pito.str>>,
         pito.obj<{}>,
         pito.obj<{}>,
         pito.obj<{}>,
@@ -91,7 +89,7 @@ export function HTTPBody
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.str()]))
     return {
         working: {
-            domain: domain,
+            domain: (domain ?? '') as Domain,
             method: method,
             path: path,
             // @ts-expect-error
@@ -102,14 +100,7 @@ export function HTTPBody
             response: pito.obj({}),
         },
         withParams(params) {
-            this.working.params = params
-            return this as any
-        },
-        addHeaders(key, val) {
-            // @ts-expect-error
-            this.working.headers.properties[key] = val
-            // @ts-expect-error
-            this.working.headers.required.push(key)
+            this.working.params = params as any
             return this as any
         },
         withHeaders(headers) {
