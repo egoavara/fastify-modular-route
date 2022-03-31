@@ -1,6 +1,7 @@
 import { pito } from "pito"
 import { PitoHeader } from "./headers"
 import { MethodHTTPBody } from "./methods"
+import { Security } from "./security"
 import { ParseRouteKeys } from "./utils"
 
 export type HTTPBody
@@ -13,6 +14,7 @@ export type HTTPBody
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Body extends pito = pito,
     Response extends pito = pito,
+    Secure extends Security = undefined,
     > = {
         domain: Domain,
         method: Method,
@@ -22,8 +24,9 @@ export type HTTPBody
         query: Query,
         body: Body,
         response: Response,
+        secure: Secure,
     }
-export type InferHTTPBody<T> = T extends HTTPBody<infer Domain, infer Method, infer Path, infer Params, infer Headers, infer Query, infer Body, infer Response>
+export type InferHTTPBody<T> = T extends HTTPBody<infer Domain, infer Method, infer Path, infer Params, infer Headers, infer Query, infer Body, infer Response, infer Secure>
     ? {
         Domain: Domain,
         Method: Method,
@@ -33,6 +36,7 @@ export type InferHTTPBody<T> = T extends HTTPBody<infer Domain, infer Method, in
         Query: Query,
         Body: Body,
         Response: Response,
+        Secure: Secure,
     }
     : never
 
@@ -46,29 +50,34 @@ export type HTTPBodyBuilder
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Body extends pito = pito,
     Response extends pito = pito,
+    Secure extends Security = undefined,
     > = {
-        working: HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response>
+        working: HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response, Secure>
         withParams
             <NewParams extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : HTTPBodyBuilder<Domain, Method, Path, NewParams, Headers, Query, Body, Response>
+            : HTTPBodyBuilder<Domain, Method, Path, NewParams, Headers, Query, Body, Response, Secure>
         withHeaders
             <NewHeaders extends PitoHeader>
             (headers: NewHeaders)
-            : HTTPBodyBuilder<Domain, Method, Path, Params, NewHeaders, Query, Body, Response>
+            : HTTPBodyBuilder<Domain, Method, Path, Params, NewHeaders, Query, Body, Response, Secure>
         withQuery
             <NewQuery extends pito.obj<Record<string, pito>>>
             (query: NewQuery)
-            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, NewQuery, Body, Response>
+            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, NewQuery, Body, Response, Secure>
         withBody
             <NewBody extends pito>
             (body: NewBody)
-            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, NewBody, Response>
+            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, NewBody, Response, Secure>
         withResponse
             <NewResponse extends pito>
             (response: NewResponse)
             : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, Body, NewResponse>
-        build(): HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response>
+        withSecure
+            <NewSecure extends Security>
+            (secure: NewSecure)
+            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, Body, Response, NewSecure>
+        build(): HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response, Secure>
     }
 
 
@@ -117,6 +126,10 @@ export function HTTPBody
         },
         withResponse(response) {
             this.working.response = response as any
+            return this as any
+        },
+        withSecure(secure) {
+            this.working.secure = secure as any
             return this as any
         },
         build() {

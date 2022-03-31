@@ -1,0 +1,1 @@
+export type Security = 'JWT-bearer' | undefined
