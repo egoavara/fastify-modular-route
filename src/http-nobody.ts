@@ -1,7 +1,7 @@
 import { pito } from "pito"
 import { PitoHeader } from "./headers"
 import { MethodHTTPNoBody } from "./methods"
-import { Security } from "./security"
+import { Presets } from "./preset"
 import { ParseRouteKeys } from "./utils"
 
 export type HTTPNoBody
@@ -13,7 +13,7 @@ export type HTTPNoBody
     Headers extends PitoHeader = PitoHeader,
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Response extends pito = pito,
-    Secure extends Security = undefined,
+    Preset extends Presets = undefined,
     > = {
         domain: Domain,
         method: Method,
@@ -22,9 +22,9 @@ export type HTTPNoBody
         headers: Headers,
         query: Query,
         response: Response,
-        secure: Secure,
+        presets: Preset[],
     }
-export type InferHTTPNoBody<T> = T extends HTTPNoBody<infer Domain, infer Method, infer Path, infer Params, infer Headers, infer Query, infer Response, infer Secure>
+export type InferHTTPNoBody<T> = T extends HTTPNoBody<infer Domain, infer Method, infer Path, infer Params, infer Headers, infer Query, infer Response, infer Preset>
     ? {
         Domain: Domain,
         Method: Method,
@@ -33,7 +33,7 @@ export type InferHTTPNoBody<T> = T extends HTTPNoBody<infer Domain, infer Method
         Headers: Headers,
         Query: Query,
         Response: Response,
-        Secure: Secure
+        Preset: Preset
     }
     : never
 
@@ -46,30 +46,30 @@ export type HTTPNoBodyBuilder
     Headers extends PitoHeader = PitoHeader,
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Response extends pito = pito,
-    Secure extends Security = undefined,
+    Preset extends Presets = undefined,
     > = {
-        working: HTTPNoBody<Domain, Method, Path, Params, Headers, Query, Response, Secure>
+        working: HTTPNoBody<Domain, Method, Path, Params, Headers, Query, Response, Preset>
         withParams
             <NewParams extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : HTTPNoBodyBuilder<Domain, Method, Path, NewParams, Headers, Query, Response, Secure>
+            : HTTPNoBodyBuilder<Domain, Method, Path, NewParams, Headers, Query, Response, Preset>
         withHeaders
             <NewHeaders extends PitoHeader>
             (headers: NewHeaders)
-            : HTTPNoBodyBuilder<Domain, Method, Path, Params, NewHeaders, Query, Response, Secure>
+            : HTTPNoBodyBuilder<Domain, Method, Path, Params, NewHeaders, Query, Response, Preset>
         withQuery
             <NewQuery extends pito.obj<Record<string, pito>>>
             (query: NewQuery)
-            : HTTPNoBodyBuilder<Domain, Method, Path, Params, Headers, NewQuery, Response, Secure>
+            : HTTPNoBodyBuilder<Domain, Method, Path, Params, Headers, NewQuery, Response, Preset>
         withResponse
             <NewResponse extends pito>
             (response: NewResponse)
-            : HTTPNoBodyBuilder<Domain, Method, Path, Params, Headers, Query, NewResponse, Secure>
-        withSecure
-            <NewSecure extends Security>
-            (secure: NewSecure)
-            : HTTPNoBodyBuilder<Domain, Method, Path, Params, Headers, Query, Response, NewSecure>
-        build(): HTTPNoBody<Domain, Method, Path, Params, Headers, Query, Response, Secure>
+            : HTTPNoBodyBuilder<Domain, Method, Path, Params, Headers, Query, NewResponse, Preset>
+        withPresets
+            <NewPresets extends Presets[]>
+            (...presets: NewPresets)
+            : HTTPNoBodyBuilder<Domain, Method, Path, Params, Headers, Query, Response, NewPresets[number]>
+        build(): HTTPNoBody<Domain, Method, Path, Params, Headers, Query, Response, Preset>
     }
 export function HTTPNoBody
     <Method extends MethodHTTPNoBody, Path extends string, Domain extends string,>
@@ -113,8 +113,8 @@ export function HTTPNoBody
             this.working.response = response as any
             return this as any
         },
-        withSecure(secure) {
-            this.working.secure = secure as any
+        withPresets(...presets) {
+            this.working.presets = presets as any
             return this as any
         },
         build() {

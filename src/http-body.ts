@@ -1,7 +1,7 @@
 import { pito } from "pito"
 import { PitoHeader } from "./headers"
 import { MethodHTTPBody } from "./methods"
-import { Security } from "./security"
+import { Presets } from "./preset"
 import { ParseRouteKeys } from "./utils"
 
 export type HTTPBody
@@ -14,7 +14,7 @@ export type HTTPBody
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Body extends pito = pito,
     Response extends pito = pito,
-    Secure extends Security = undefined,
+    Preset extends Presets = undefined,
     > = {
         domain: Domain,
         method: Method,
@@ -24,9 +24,9 @@ export type HTTPBody
         query: Query,
         body: Body,
         response: Response,
-        secure: Secure,
+        presets: Preset[],
     }
-export type InferHTTPBody<T> = T extends HTTPBody<infer Domain, infer Method, infer Path, infer Params, infer Headers, infer Query, infer Body, infer Response, infer Secure>
+export type InferHTTPBody<T> = T extends HTTPBody<infer Domain, infer Method, infer Path, infer Params, infer Headers, infer Query, infer Body, infer Response, infer Preset>
     ? {
         Domain: Domain,
         Method: Method,
@@ -36,7 +36,7 @@ export type InferHTTPBody<T> = T extends HTTPBody<infer Domain, infer Method, in
         Query: Query,
         Body: Body,
         Response: Response,
-        Secure: Secure,
+        Preset: Preset,
     }
     : never
 
@@ -50,34 +50,34 @@ export type HTTPBodyBuilder
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Body extends pito = pito,
     Response extends pito = pito,
-    Secure extends Security = undefined,
+    Preset extends Presets = undefined,
     > = {
-        working: HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response, Secure>
+        working: HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response, Preset>
         withParams
             <NewParams extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : HTTPBodyBuilder<Domain, Method, Path, NewParams, Headers, Query, Body, Response, Secure>
+            : HTTPBodyBuilder<Domain, Method, Path, NewParams, Headers, Query, Body, Response, Preset>
         withHeaders
             <NewHeaders extends PitoHeader>
             (headers: NewHeaders)
-            : HTTPBodyBuilder<Domain, Method, Path, Params, NewHeaders, Query, Body, Response, Secure>
+            : HTTPBodyBuilder<Domain, Method, Path, Params, NewHeaders, Query, Body, Response, Preset>
         withQuery
             <NewQuery extends pito.obj<Record<string, pito>>>
             (query: NewQuery)
-            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, NewQuery, Body, Response, Secure>
+            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, NewQuery, Body, Response, Preset>
         withBody
             <NewBody extends pito>
             (body: NewBody)
-            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, NewBody, Response, Secure>
+            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, NewBody, Response, Preset>
         withResponse
             <NewResponse extends pito>
             (response: NewResponse)
             : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, Body, NewResponse>
-        withSecure
-            <NewSecure extends Security>
-            (secure: NewSecure)
-            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, Body, Response, NewSecure>
-        build(): HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response, Secure>
+        withPresets
+            <NewPresets extends Presets[]>
+            (...presets: NewPresets)
+            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, Body, Response, NewPresets[number]>
+        build(): HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response, Preset>
     }
 
 
@@ -128,8 +128,8 @@ export function HTTPBody
             this.working.response = response as any
             return this as any
         },
-        withSecure(secure) {
-            this.working.secure = secure as any
+        withPresets(...presets) {
+            this.working.presets = presets as any
             return this as any
         },
         build() {

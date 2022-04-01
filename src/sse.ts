@@ -1,7 +1,7 @@
 import { pito } from "pito";
 import { PitoHeader } from "./headers";
 import { MethodSSE } from "./methods";
-import { Security } from "./security";
+import { Presets } from "./preset";
 import { ParseRouteKeys } from "./utils";
 
 
@@ -13,7 +13,7 @@ export type SSE
     Headers extends PitoHeader = PitoHeader,
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Packet extends pito = pito,
-    Secure extends Security = undefined,
+    Preset extends Presets = undefined,
     > = {
         domain: Domain,
         method: MethodSSE,
@@ -22,9 +22,9 @@ export type SSE
         headers: Headers,
         query: Query,
         packet: Packet,
-        secure: Secure,
+        presets: Preset[],
     }
-export type InferSSE<T> = T extends SSE<infer Domain, infer Path, infer Params, infer Headers, infer Query, infer Packet, infer Secure>
+export type InferSSE<T> = T extends SSE<infer Domain, infer Path, infer Params, infer Headers, infer Query, infer Packet, infer Preset>
     ? {
         Domain: Domain,
         Path: Path,
@@ -32,7 +32,7 @@ export type InferSSE<T> = T extends SSE<infer Domain, infer Path, infer Params, 
         Headers: Headers,
         Query: Query,
         Packet: Packet,
-        Secure: Secure,
+        Preset: Preset,
     }
     : never
 
@@ -44,31 +44,31 @@ export type SSEBuilder
     Headers extends PitoHeader = PitoHeader,
     Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
     Packet extends pito = pito,
-    Secure extends Security = undefined,
+    Preset extends Presets = undefined,
     > = {
-        working: SSE<Domain, Path, Params, Headers, Query, Packet, Secure>
+        working: SSE<Domain, Path, Params, Headers, Query, Packet, Preset>
         withParams
             <NewParams extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : SSEBuilder<Domain, Path, NewParams, Headers, Query, Packet, Secure>
+            : SSEBuilder<Domain, Path, NewParams, Headers, Query, Packet, Preset>
         withHeaders
             <NewHeaders extends PitoHeader>
             (headers: NewHeaders)
-            : SSEBuilder<Domain, Path, Params, NewHeaders, Query, Packet, Secure>
+            : SSEBuilder<Domain, Path, Params, NewHeaders, Query, Packet, Preset>
         withQuery
             <NewQuery extends pito.obj<Record<string, pito>>>
             (query: NewQuery)
-            : SSEBuilder<Domain, Path, Params, Headers, NewQuery, Packet, Secure>
+            : SSEBuilder<Domain, Path, Params, Headers, NewQuery, Packet, Preset>
         withPacket
             <NewPacket extends pito>
             (packet: NewPacket)
-            : SSEBuilder<Domain, Path, Params, Headers, Query, NewPacket, Secure>
+            : SSEBuilder<Domain, Path, Params, Headers, Query, NewPacket, Preset>
 
-        withSecure
-            <NewSecure extends Security>
-            (secure: NewSecure)
-            : SSEBuilder<Domain, Path, Params, Headers, Query, Packet, NewSecure>
-        build(): SSE<Domain, Path, Params, Headers, Query, Packet, Secure>
+        withPresets
+            <NewPresets extends Presets[]>
+            (...presets: NewPresets)
+            : SSEBuilder<Domain, Path, Params, Headers, Query, Packet, NewPresets[number]>
+        build(): SSE<Domain, Path, Params, Headers, Query, Packet, Preset>
     }
 
 export function SSE
@@ -112,8 +112,8 @@ export function SSE
             this.working.packet = packet as any
             return this as any
         },
-        withSecure(secure) {
-            this.working.secure = secure as any
+        withPresets(...presets) {
+            this.working.presets = presets as any
             return this as any
         },
         build() {
