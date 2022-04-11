@@ -48,7 +48,6 @@ tap.test('builder', async t => {
 
 tap.test('builder no param', async t => {
     const def = HTTPNoBody("GET", "/a/b/c/d").build()
-
     t.same(
         def.domain,
         '',
@@ -57,4 +56,10 @@ tap.test('builder no param', async t => {
         def.path,
         '/a/b/c/d',
     )
+})
+tap.test('presets', async t => {
+    const noPreset = HTTPNoBody("GET", "/a/b/c/d").build()
+    const morePresets = HTTPNoBody("GET", "/a/b/c/d").withPresets('a', 'b').build()
+    t.same(noPreset.presets, [])
+    t.same(morePresets.presets, ['a', 'b'])
 })

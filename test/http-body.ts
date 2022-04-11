@@ -64,3 +64,10 @@ tap.test('builder no param', async t => {
         '/a/b/c/d',
     )
 })
+
+tap.test('presets', async t => {
+    const noPreset = HTTPBody("POST", "/a/b/c/d").build()
+    const morePresets = HTTPBody("POST", "/a/b/c/d").withPresets('a', 'b').build()
+    t.same(noPreset.presets, [])
+    t.same(morePresets.presets, ['a', 'b'])
+})

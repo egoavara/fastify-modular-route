@@ -107,6 +107,7 @@ export function HTTPBody
             headers: pito.obj({}),
             body: pito.obj({}),
             response: pito.obj({}),
+            presets: [],
         },
         withParams(params) {
             this.working.params = params as any
