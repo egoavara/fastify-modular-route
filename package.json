@@ -1,6 +1,6 @@
 {
   "name": "fastify-modular-route",
-  "version": "0.0.11",
+  "version": "0.0.13",
   "description": "route template for fastify-modular ",
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
@@ -29,7 +29,8 @@
     "watch": "npm run \"watch:cjs\" & npm run \"watch:esm\"",
     "watch:cjs": "rimraf \"cjs/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc --watch -p ./cjs/tsconfig.json",
     "watch:esm": "rimraf \"esm/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc --watch -p ./esm/tsconfig.json",
-    "test": "tap --ts"
+    "test": "tap --ts",
+    "prepack": "npm run build && npm run test"
   },
   "keywords": [
     "typescript",
