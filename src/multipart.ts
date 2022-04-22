@@ -5,21 +5,12 @@ import { ParseRouteKeys } from "./utils"
 import { Readable } from 'stream'
 
 export type LimitFile = {
-    fieldNameSize: number,  // Max field name size in bytes
-    fieldSize: number,      // Max field value size in bytes
-    fields: number,         // Max number of non-file fields
-    fileSize: number,       // For multipart forms, the max file size in bytes
-    files: number,          // Max number of file fields
-    headerPairs: number     // Max number of header key=>value pairs
-}
-export type MultipartFile = {
-    fieldname: string,
-    filename: string,
-    filepath: string,
-    encoding: string,
-    mimetype: string,
-    file: Readable
-    toBuffer: () => Promise<Buffer>,
+    fieldNameSize?: number,  // Max field name size in bytes
+    fieldSize?: number,      // Max field value size in bytes
+    fields?: number,         // Max number of non-file fields
+    fileSize?: number,       // For multipart forms, the max file size in bytes
+    files?: number,          // Max number of file fields
+    headerPairs?: number     // Max number of header key=>value pairs
 }
 
 export type Multipart

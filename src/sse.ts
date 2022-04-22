@@ -94,7 +94,7 @@ export function SSE
             query: pito.obj({}),
             headers: pito.obj({}),
             body: pito.obj({}),
-            response: pito.obj({}),
+            packet: pito.obj({}),
             presets: [],
         },
         withParams(params) {
