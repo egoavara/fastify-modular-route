@@ -89,7 +89,7 @@ export type WSBuilder
         withRecv
             <NewRecv extends pito>
             (recv: NewRecv)
-            : WSBuilder<Domain, Path, Params, Headers, Query, Send, Recv, Request, Response, Preset>
+            : WSBuilder<Domain, Path, Params, Headers, Query, Send, NewRecv, Request, Response, Preset>
 
         withRequest
             <NewRequest extends Record<string, { args: pito, return: pito }>>
