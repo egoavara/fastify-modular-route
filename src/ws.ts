@@ -9,12 +9,12 @@ export type WS
     <
     Domain extends string,
     Path extends string,
-    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Headers extends PitoHeader = PitoHeader,
-    Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
+    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
     // 
-    Send extends pito = pito.obj<{}>,
-    Recv extends pito = pito.obj<{}>,
+    Send extends pito = pito.Obj<{}>,
+    Recv extends pito = pito.Obj<{}>,
     Request extends Record<string, { args: pito, return: pito }> = {},
     Response extends Record<string, { args: pito, return: pito }> = {},
     // 
@@ -58,18 +58,18 @@ export type WSBuilder
     <
     Domain extends string,
     Path extends string,
-    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Headers extends PitoHeader = PitoHeader,
-    Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
-    Send extends pito = pito.obj<{}>,
-    Recv extends pito = pito.obj<{}>,
+    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
+    Send extends pito = pito.Obj<{}>,
+    Recv extends pito = pito.Obj<{}>,
     Request extends Record<string, { args: pito, return: pito }> = {},
     Response extends Record<string, { args: pito, return: pito }> = {},
     Preset extends Presets = undefined,
     > = {
         working: WS<Domain, Path, Params, Headers, Query, Send, Recv, Request, Response, Preset>
         withParams
-            <NewParams extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : WSBuilder<Domain, Path, NewParams, Headers, Query, Send, Recv, Request, Response, Preset>
         withHeaders
@@ -77,7 +77,7 @@ export type WSBuilder
             (headers: NewHeaders)
             : WSBuilder<Domain, Path, Params, NewHeaders, Query, Send, Recv, Request, Response, Preset>
         withQuery
-            <NewQuery extends pito.obj<Record<string, pito>>>
+            <NewQuery extends pito.Obj<Record<string, pito>>>
             (query: NewQuery)
             : WSBuilder<Domain, Path, Params, Headers, NewQuery, Send, Recv, Request, Response, Preset>
 
@@ -113,19 +113,19 @@ export function WS
     (path: Path, domain?: Domain)
     : WSBuilder<Domain, Path> {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g);
-    const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.str()]))
+    const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
     return {
         working: {
             domain: (domain ?? '') as Domain,
             method: 'WS',
             path: path,
             // @ts-expect-error
-            params: pito.obj(params),
-            query: pito.obj({}),
-            headers: pito.obj({}),
-            body: pito.obj({}),
-            send: pito.obj({}),
-            recv: pito.obj({}),
+            params: pito.Obj(params),
+            query: pito.Obj({}),
+            headers: pito.Obj({}),
+            body: pito.Obj({}),
+            send: pito.Obj({}),
+            recv: pito.Obj({}),
             request: {},
             response: {},
             presets: [],

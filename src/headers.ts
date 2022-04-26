@@ -5,4 +5,4 @@ export type HeaderKeys =
     | 'Content-Type'
     | (string & Record<never, never>)
 
-export type PitoHeader = pito.obj<Record<string, pito>>
+export type PitoHeader = pito.Obj<Record<string, pito>>

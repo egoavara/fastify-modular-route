@@ -9,9 +9,9 @@ export type HTTPBody
     Domain extends string,
     Method extends MethodHTTPBody,
     Path extends string,
-    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Headers extends PitoHeader = PitoHeader,
-    Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
+    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
     Body extends pito = pito,
     Response extends pito = pito,
     Preset extends Presets = undefined,
@@ -45,16 +45,16 @@ export type HTTPBodyBuilder
     Domain extends string,
     Method extends MethodHTTPBody,
     Path extends string,
-    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Headers extends PitoHeader = PitoHeader,
-    Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
+    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
     Body extends pito = pito,
     Response extends pito = pito,
     Preset extends Presets = undefined,
     > = {
         working: HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response, Preset>
         withParams
-            <NewParams extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : HTTPBodyBuilder<Domain, Method, Path, NewParams, Headers, Query, Body, Response, Preset>
         withHeaders
@@ -62,7 +62,7 @@ export type HTTPBodyBuilder
             (headers: NewHeaders)
             : HTTPBodyBuilder<Domain, Method, Path, Params, NewHeaders, Query, Body, Response, Preset>
         withQuery
-            <NewQuery extends pito.obj<Record<string, pito>>>
+            <NewQuery extends pito.Obj<Record<string, pito>>>
             (query: NewQuery)
             : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, NewQuery, Body, Response, Preset>
         withBody
@@ -88,25 +88,25 @@ export function HTTPBody
         Domain,
         Method,
         Path,
-        pito.obj<Record<ParseRouteKeys<Path>, pito.str>>,
-        pito.obj<{}>,
-        pito.obj<{}>,
-        pito.obj<{}>,
-        pito.obj<{}>
+        pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>,
+        pito.Obj<{}>,
+        pito.Obj<{}>,
+        pito.Obj<{}>,
+        pito.Obj<{}>
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g);
-    const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.str()]))
+    const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
     return {
         working: {
             domain: (domain ?? '') as Domain,
             method: method,
             path: path,
             // @ts-expect-error
-            params: pito.obj(params),
-            query: pito.obj({}),
-            headers: pito.obj({}),
-            body: pito.obj({}),
-            response: pito.obj({}),
+            params: pito.Obj(params),
+            query: pito.Obj({}),
+            headers: pito.Obj({}),
+            body: pito.Obj({}),
+            response: pito.Obj({}),
             presets: [],
         },
         withParams(params) {

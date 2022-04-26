@@ -9,9 +9,9 @@ export type SSE
     <
     Domain extends string,
     Path extends string,
-    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Headers extends PitoHeader = PitoHeader,
-    Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
+    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
     Packet extends pito = pito,
     Preset extends Presets = undefined,
     > = {
@@ -40,15 +40,15 @@ export type SSEBuilder
     <
     Domain extends string,
     Path extends string,
-    Params extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Headers extends PitoHeader = PitoHeader,
-    Query extends pito.obj<Record<string, pito>> = pito.obj<Record<string, pito>>,
+    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
     Packet extends pito = pito,
     Preset extends Presets = undefined,
     > = {
         working: SSE<Domain, Path, Params, Headers, Query, Packet, Preset>
         withParams
-            <NewParams extends pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : SSEBuilder<Domain, Path, NewParams, Headers, Query, Packet, Preset>
         withHeaders
@@ -56,7 +56,7 @@ export type SSEBuilder
             (headers: NewHeaders)
             : SSEBuilder<Domain, Path, Params, NewHeaders, Query, Packet, Preset>
         withQuery
-            <NewQuery extends pito.obj<Record<string, pito>>>
+            <NewQuery extends pito.Obj<Record<string, pito>>>
             (query: NewQuery)
             : SSEBuilder<Domain, Path, Params, Headers, NewQuery, Packet, Preset>
         withPacket
@@ -77,24 +77,24 @@ export function SSE
     : SSEBuilder<
         Domain,
         Path,
-        pito.obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-        pito.obj<{}>,
-        pito.obj<{}>,
-        pito.obj<{}>
+        pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        pito.Obj<{}>,
+        pito.Obj<{}>,
+        pito.Obj<{}>
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g);
-    const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.str()]))
+    const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
     return {
         working: {
             domain: (domain ?? '') as Domain,
             method: 'SSE',
             path: path,
             // @ts-expect-error
-            params: pito.obj(params),
-            query: pito.obj({}),
-            headers: pito.obj({}),
-            body: pito.obj({}),
-            packet: pito.obj({}),
+            params: pito.Obj(params),
+            query: pito.Obj({}),
+            headers: pito.Obj({}),
+            body: pito.Obj({}),
+            packet: pito.Obj({}),
             presets: [],
         },
         withParams(params) {
