@@ -70,7 +70,7 @@ export type MultipartBuilder
         build(): Multipart<Domain, Path, Params, Headers, Query, Preset>
     }
 export function Multipart
-    <Path extends string, Domain extends string,>
+    <Path extends string, Domain extends string=''>
     (path: Path, domain?: Domain)
     : MultipartBuilder<
         Domain,
