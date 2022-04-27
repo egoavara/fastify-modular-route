@@ -10,10 +10,10 @@ export type HTTPBody
     Method extends MethodHTTPBody,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-    Headers extends PitoHeader = PitoHeader,
-    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
-    Body extends pito = pito,
-    Response extends pito = pito,
+    Headers extends pito = PitoHeader,
+    Query extends pito = pito.Any,
+    Body extends pito = pito.Any,
+    Response extends pito = pito.Any,
     Preset extends Presets = undefined,
     > = {
         domain: Domain,
@@ -45,12 +45,12 @@ export type HTTPBodyBuilder
     Domain extends string,
     Method extends MethodHTTPBody,
     Path extends string,
-    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-    Headers extends PitoHeader = PitoHeader,
-    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
-    Body extends pito = pito,
-    Response extends pito = pito,
-    Preset extends Presets = undefined,
+    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+    Headers extends pito,
+    Query extends pito,
+    Body extends pito,
+    Response extends pito,
+    Preset extends Presets,
     > = {
         working: HTTPBody<Domain, Method, Path, Params, Headers, Query, Body, Response, Preset>
         withParams
@@ -72,7 +72,7 @@ export type HTTPBodyBuilder
         withResponse
             <NewResponse extends pito>
             (response: NewResponse)
-            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, Body, NewResponse>
+            : HTTPBodyBuilder<Domain, Method, Path, Params, Headers, Query, Body, NewResponse, Preset>
         withPresets
             <NewPresets extends Presets[]>
             (...presets: NewPresets)
@@ -89,10 +89,11 @@ export function HTTPBody
         Method,
         Path,
         pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>,
-        pito.Obj<{}>,
-        pito.Obj<{}>,
-        pito.Obj<{}>,
-        pito.Obj<{}>
+        pito.Any,
+        pito.Any,
+        pito.Any,
+        pito.Any,
+        never
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g);
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
@@ -103,10 +104,10 @@ export function HTTPBody
             path: path,
             // @ts-expect-error
             params: pito.Obj(params),
-            query: pito.Obj({}),
-            headers: pito.Obj({}),
-            body: pito.Obj({}),
-            response: pito.Obj({}),
+            query: pito.Any(),
+            headers: pito.Any(),
+            body: pito.Any(),
+            response: pito.Any(),
             presets: [],
         },
         withParams(params) {

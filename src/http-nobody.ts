@@ -10,8 +10,8 @@ export type HTTPNoBody
     Method extends MethodHTTPNoBody,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-    Headers extends PitoHeader = PitoHeader,
-    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
+    Headers extends pito = PitoHeader,
+    Query extends pito = pito,
     Response extends pito = pito,
     Preset extends Presets = undefined,
     > = {
@@ -42,11 +42,11 @@ export type HTTPNoBodyBuilder
     Domain extends string,
     Method extends MethodHTTPNoBody,
     Path extends string,
-    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-    Headers extends PitoHeader = PitoHeader,
-    Query extends pito.Obj<Record<string, pito>> = pito.Obj<Record<string, pito>>,
-    Response extends pito = pito,
-    Preset extends Presets = undefined,
+    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+    Headers extends pito,
+    Query extends pito,
+    Response extends pito,
+    Preset extends Presets,
     > = {
         working: HTTPNoBody<Domain, Method, Path, Params, Headers, Query, Response, Preset>
         withParams
@@ -79,9 +79,10 @@ export function HTTPNoBody
         Method,
         Path,
         pito.Obj<Record<ParseRouteKeys<Path>, pito<any, any, { type: 'string' | 'number' | 'integer' | 'boolean' }, any>>>,
-        pito.Obj<{}>,
-        pito.Obj<{}>,
-        pito.Obj<{}>
+        pito.Any,
+        pito.Any,
+        pito.Any,
+        never
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g);
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
@@ -92,10 +93,9 @@ export function HTTPNoBody
             path: path,
             // @ts-expect-error
             params: pito.Obj(params),
-            query: pito.Obj({}),
-            headers: pito.Obj({}),
-            body: pito.Obj({}),
-            response: pito.Obj({}),
+            headers: pito.Any(),
+            query: pito.Any(),
+            response: pito.Any(),
             presets: [],
         },
         withParams(params) {

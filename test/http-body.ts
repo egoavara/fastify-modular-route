@@ -4,17 +4,17 @@ import { HTTPBody } from '../cjs'
 
 
 tap.test('builder', async t => {
-    const header = pito.obj({
-        Help: pito.regex('^Help [a-zA-Z_\-]+')
+    const header = pito.Obj({
+        Help: pito.Regex('^Help [a-zA-Z_\-]+')
     })
-    const query = pito.obj({
-        Q: pito.num()
+    const query = pito.Obj({
+        Q: pito.Num()
     })
-    const param = pito.obj({
-        c: pito.num()
+    const param = pito.Obj({
+        c: pito.Num()
     })
-    const body = pito.str()
-    const res = pito.int()
+    const body = pito.Str()
+    const res = pito.Int()
 
 
     const def = HTTPBody("POST", "/a/b/:c/d", 'Test')
