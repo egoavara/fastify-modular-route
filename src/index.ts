@@ -15,7 +15,7 @@ export * from './preset'
 export * from './sse'
 export * from './ws'
 export * from './utils'
-
+export * from 'pito'
 
 export type Route =
     | HTTPBody<string, MethodHTTPBody, string, any, any, any, any, any, Presets>
