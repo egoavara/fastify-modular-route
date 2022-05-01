@@ -72,7 +72,7 @@ export type HTTPNoBodyBuilder
         build(): HTTPNoBody<Domain, Method, Path, Params, Headers, Query, Response, Preset>
     }
 export function HTTPNoBody
-    <Method extends MethodHTTPNoBody, Path extends string, Domain extends string,>
+    <Method extends MethodHTTPNoBody, Path extends string, Domain extends string=''>
     (method: Method, path: Path, domain?: Domain)
     : HTTPNoBodyBuilder<
         Domain,
