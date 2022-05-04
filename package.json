@@ -1,6 +1,6 @@
 {
   "name": "fastify-modular-route",
-  "version": "0.0.22",
+  "version": "0.1.3",
   "description": "route template for fastify-modular ",
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
@@ -47,6 +47,6 @@
     "typescript": "^4.6.3"
   },
   "dependencies": {
-    "pito": "^0.0.12"
+    "pito": "^0.0.17"
   }
 }

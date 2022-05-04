@@ -20,7 +20,7 @@ export * from "pito"
 export type Route =
     | HTTPBody<string, MethodHTTPBody, string, any, any, any, any, any, Presets>
     | HTTPNoBody<string, MethodHTTPNoBody, string, any, any, any, any, Presets>
-    | Multipart<string, string, any, any, any, Presets>
+    | Multipart<string, string, any, any, any, any, Presets>
     | SSE<string, string, any, any, any, any, Presets>
     | WS<string, string, any, any, any, any, any, any, any, Presets>
 

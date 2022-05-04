@@ -19,6 +19,7 @@ export type Multipart
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Headers extends pito = PitoHeader,
     Query extends pito = pito,
+    Response extends pito = pito.Any,
     Preset extends Presets = undefined,
     > = {
         domain: Domain,
@@ -30,13 +31,14 @@ export type Multipart
         response: Response,
         presets: Preset[],
     }
-export type InferMultipart<T> = T extends Multipart<infer Domain, infer Path, infer Params, infer Headers, infer Query, infer Preset>
+export type InferMultipart<T> = T extends Multipart<infer Domain, infer Path, infer Params, infer Headers, infer Query, infer Response, infer Preset>
     ? {
         Domain: Domain,
         Path: Path,
         Params: Params,
         Headers: Headers,
         Query: Query,
+        Response: Response,
         Preset: Preset
     }
     : never
@@ -48,34 +50,40 @@ export type MultipartBuilder
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Headers extends pito,
     Query extends pito,
+    Response extends pito,
     Preset extends Presets,
     > = {
-        working: Multipart<Domain, Path, Params, Headers, Query, Preset>
+        working: Multipart<Domain, Path, Params, Headers, Query, Response, Preset>
         withParams
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : MultipartBuilder<Domain, Path, NewParams, Headers, Query, Preset>
+            : MultipartBuilder<Domain, Path, NewParams, Headers, Query, Response, Preset>
         withHeaders
             <NewHeaders extends PitoHeader>
             (headers: NewHeaders)
-            : MultipartBuilder<Domain, Path, Params, NewHeaders, Query, Preset>
+            : MultipartBuilder<Domain, Path, Params, NewHeaders, Query, Response, Preset>
         withQuery
             <NewQuery extends pito.Obj<Record<string, pito>>>
             (query: NewQuery)
-            : MultipartBuilder<Domain, Path, Params, Headers, NewQuery, Preset>
+            : MultipartBuilder<Domain, Path, Params, Headers, NewQuery, Response, Preset>
+        withResponse
+            <NewResponse extends pito>
+            (response: NewResponse)
+            : MultipartBuilder<Domain, Path, Params, Headers, Query, NewResponse, Preset>
         withPresets
             <NewPresets extends Presets[]>
             (...presets: NewPresets)
-            : MultipartBuilder<Domain, Path, Params, Headers, Query, NewPresets[number]>
-        build(): Multipart<Domain, Path, Params, Headers, Query, Preset>
+            : MultipartBuilder<Domain, Path, Params, Headers, Query, Response, NewPresets[number]>
+        build(): Multipart<Domain, Path, Params, Headers, Query, Response, Preset>
     }
 export function Multipart
-    <Path extends string, Domain extends string=''>
+    <Path extends string, Domain extends string = ''>
     (path: Path, domain?: Domain)
     : MultipartBuilder<
         Domain,
         Path,
         pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number, any, any, any>>>,
+        pito.Any,
         pito.Any,
         pito.Any,
         never
@@ -91,6 +99,7 @@ export function Multipart
             params: pito.Obj(params),
             query: pito.Any(),
             headers: pito.Any(),
+            response : pito.Any(),
             presets: [],
         },
         withParams(params) {
@@ -103,6 +112,10 @@ export function Multipart
         },
         withQuery(query) {
             this.working.query = query as any
+            return this as any
+        },
+        withResponse(response) {
+            this.working.response = response as any
             return this as any
         },
         withPresets(...presets) {
