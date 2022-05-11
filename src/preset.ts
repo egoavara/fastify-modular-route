@@ -1,4 +1,5 @@
 export type Presets =
-    | 'JWT-bearer'
+    | 'jwt-bearer'
+    | 'manual-authid'
     | (string & Record<never, never>)
     | undefined
