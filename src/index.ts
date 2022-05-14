@@ -21,6 +21,18 @@ export type Route =
     | Multipart<string, string, any, any, any, any>
     | SSE<string, string, any, any, any, any>
     | WS<string, string, any, any, any, any, any, any, any>
+export type InferPrefix<R extends Route> =
+    R extends HTTPBody<string, MethodHTTPBody, string, any, any, any, any, infer Prefix>
+    ? Prefix
+    : R extends HTTPNoBody<string, MethodHTTPNoBody, string, any, any, any, infer Prefix>
+    ? Prefix
+    : R extends Multipart<string, string, any, any, any, infer Prefix>
+    ? Prefix
+    : R extends SSE<string, string, any, any, any, infer Prefix>
+    ? Prefix
+    : R extends WS<string, string, any, any, any, any, any, any, infer Prefix>
+    ? Prefix
+    : never
 
 export function wsCaller<Caller extends Record<string, { args: [...pito[]], return: pito }>>(caller: Caller): Caller {
     return caller
