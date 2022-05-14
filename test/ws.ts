@@ -11,7 +11,7 @@ tap.test('builder', async t => {
     })
     const send = pito.Str()
     const recv = pito.Num()
-    const req = wsCaller({ a: { args: [pito.Num()], return: pito.Num() } })
+    const req = wsCaller({ a: { args: [], return: pito.Num() } })
     const res = wsCaller({ b: { args: [pito.Num()], return: pito.Num() } })
     const def = WS("/a/b/:c/d", 'WS')
         .withParams(param)

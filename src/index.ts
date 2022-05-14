@@ -34,6 +34,6 @@ export type InferPrefix<R extends Route> =
     ? Prefix
     : never
 
-export function wsCaller<Caller extends Record<string, { args: [...pito[]], return: pito }>>(caller: Caller): Caller {
+export function wsCaller<Caller extends Record<string, { args: [pito] | [...pito[]], return: pito }>>(caller: Caller): Caller {
     return caller
 }

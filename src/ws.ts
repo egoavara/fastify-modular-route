@@ -14,7 +14,7 @@ export type WS
     Send extends pito = pito,
     Recv extends pito = pito,
     Request extends Record<string, { args: [...pito[]], return: pito }> = {},
-    Response extends Record<string, { args:  [...pito[]], return: pito }> = {},
+    Response extends Record<string, { args: [...pito[]], return: pito }> = {},
     // 
     Preset extends AnyPresets = never,
     > = {
@@ -60,8 +60,8 @@ export type WSBuilder
     Query extends pito,
     Send extends pito,
     Recv extends pito,
-    Request extends Record<string, { args:  [...pito[]], return: pito }>,
-    Response extends Record<string, { args:  [...pito[]], return: pito }>,
+    Request extends Record<string, { args: [...pito[]], return: pito }>,
+    Response extends Record<string, { args: [...pito[]], return: pito }>,
     Preset extends AnyPresets,
     > = {
         working: WS<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset>
@@ -86,12 +86,12 @@ export type WSBuilder
             : WSBuilder<Domain, Path, Params, Query, Send, NewRecv, Request, Response, Preset>
 
         withRequest
-            <NewRequest extends Record<string, { args:  [...pito[]], return: pito }>>
+            <NewRequest extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
             (request: NewRequest)
             : WSBuilder<Domain, Path, Params, Query, Send, Recv, NewRequest, Response, Preset>
 
         withResponse
-            <NewResponse extends Record<string, { args:  [...pito[]], return: pito }>>
+            <NewResponse extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
             (response: NewResponse)
             : WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, NewResponse, Preset>
 
