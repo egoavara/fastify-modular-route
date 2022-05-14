@@ -1,6 +1,6 @@
 {
   "name": "fastify-modular-route",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "route template for fastify-modular ",
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
@@ -37,13 +37,12 @@
   "devDependencies": {
     "@types/node": "^17.0.33",
     "@types/tap": "^15.0.6",
-    "pito": "^0.1.0",
     "rimraf": "^3.0.2",
     "tap": "^16.0.1",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
   },
-  "peerDependencies": {
+  "dependencies": {
     "pito": "^0.1.0"
   }
 }
