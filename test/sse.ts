@@ -3,9 +3,6 @@ import tap from 'tap'
 import { SSE } from '../cjs'
 
 tap.test('builder', async t => {
-    const header = pito.Obj({
-        Help: pito.Regex('^Help [a-zA-Z_\-]+')
-    })
     const query = pito.Obj({
         Q: pito.Num()
     })
@@ -14,7 +11,6 @@ tap.test('builder', async t => {
     })
     const pack = pito.Str()
     const def = SSE("/a/b/:c/d", 'SSE')
-        .withHeaders(header)
         .withParams(param)
         .withQuery(query)
         .withPacket(pack)
@@ -23,10 +19,6 @@ tap.test('builder', async t => {
     t.same(
         def.domain,
         'SSE',
-    )
-    t.same(
-        pito.strict(def.headers),
-        pito.strict(header),
     )
     t.same(
         pito.strict(def.params),
@@ -55,7 +47,7 @@ tap.test('builder other branch', async t => {
 })
 tap.test('presets', async t => {
     const noPreset = SSE("/a/b/c/d").build()
-    const morePresets = SSE("/a/b/c/d").withPresets('a', 'b').build()
+    const morePresets = SSE("/a/b/c/d").withPreset('a').withPreset('b').build()
     t.same(noPreset.presets, [])
     t.same(morePresets.presets, ['a', 'b'])
 })

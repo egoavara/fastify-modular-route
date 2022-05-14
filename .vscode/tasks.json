@@ -2,34 +2,39 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "watch:cjs",
-            "type": "typescript",
-            "tsconfig": "./cjs/tsconfig.json",
-            "option": "watch",
-            "problemMatcher": [
-                "$tsc-watch"
-            ],
-            "group": "build"
-        },
-        {
-            "label": "watch:esm",
-            "type": "typescript",
-            "tsconfig": "./esm/tsconfig.json",
-            "option": "watch",
-            "problemMatcher": [
-                "$tsc-watch"
-            ],
-            "group": "build"
-        },
-        {
             "label": "watch",
             "dependsOrder": "parallel",
-            "dependsOn": [
+            "dependsOn" :[
                 "watch:cjs",
-                "watch:esm",
+                "watch:esm"
             ],
             "group": {
                 "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "watch:cjs",
+            "type": "npm",
+            "script": "watch:cjs",
+            "group": {
+                "kind": "build",
+            }
+        },
+        {
+            "label": "watch:esm",
+            "type": "npm",
+            "script": "watch:esm",
+            "group": {
+                "kind": "build",
+            }
+        },
+        {
+            "label": "test",
+            "type": "npm",
+            "script": "test",
+            "group": {
+                "kind": "test",
                 "isDefault": true
             }
         },

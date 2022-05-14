@@ -1,7 +1,6 @@
 import { pito } from "pito"
-import { PitoHeader } from "./headers"
-import { Presets } from "./preset"
-import { ParseRouteKeys } from "./utils"
+import { KnownPresets, AnyPresets } from "./preset.js"
+import { ParseRouteKeys } from "./utils.js"
 
 export type LimitFile = {
     fieldNameSize?: number,  // Max field name size in bytes
@@ -17,26 +16,25 @@ export type Multipart
     Domain extends string,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-    Headers extends pito = PitoHeader,
+
     Query extends pito = pito,
     Response extends pito = pito.Any,
-    Preset extends Presets = undefined,
+    Preset extends AnyPresets = never,
     > = {
         domain: Domain,
         method: 'MULTIPART',
         path: Path,
         params: Params,
-        headers: Headers,
+
         query: Query,
         response: Response,
         presets: Preset[],
     }
-export type InferMultipart<T> = T extends Multipart<infer Domain, infer Path, infer Params, infer Headers, infer Query, infer Response, infer Preset>
+export type InferMultipart<T> = T extends Multipart<infer Domain, infer Path, infer Params,  infer Query, infer Response, infer Preset>
     ? {
         Domain: Domain,
         Path: Path,
         Params: Params,
-        Headers: Headers,
         Query: Query,
         Response: Response,
         Preset: Preset
@@ -48,33 +46,31 @@ export type MultipartBuilder
     Domain extends string,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-    Headers extends pito,
+
     Query extends pito,
     Response extends pito,
-    Preset extends Presets,
+    Preset extends AnyPresets,
     > = {
-        working: Multipart<Domain, Path, Params, Headers, Query, Response, Preset>
+        working: Multipart<Domain, Path, Params, Query, Response, Preset>
         withParams
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : MultipartBuilder<Domain, Path, NewParams, Headers, Query, Response, Preset>
-        withHeaders
-            <NewHeaders extends PitoHeader>
-            (headers: NewHeaders)
-            : MultipartBuilder<Domain, Path, Params, NewHeaders, Query, Response, Preset>
+            : MultipartBuilder<Domain, Path, NewParams, Query, Response, Preset>
         withQuery
             <NewQuery extends pito.Obj<Record<string, pito>>>
             (query: NewQuery)
-            : MultipartBuilder<Domain, Path, Params, Headers, NewQuery, Response, Preset>
+            : MultipartBuilder<Domain, Path, Params, NewQuery, Response, Preset>
         withResponse
             <NewResponse extends pito>
             (response: NewResponse)
-            : MultipartBuilder<Domain, Path, Params, Headers, Query, NewResponse, Preset>
-        withPresets
-            <NewPresets extends Presets[]>
-            (...presets: NewPresets)
-            : MultipartBuilder<Domain, Path, Params, Headers, Query, Response, NewPresets[number]>
-        build(): Multipart<Domain, Path, Params, Headers, Query, Response, Preset>
+            : MultipartBuilder<Domain, Path, Params, Query, NewResponse, Preset>
+
+
+        withPreset<NewPreset extends KnownPresets>(preset: NewPreset): MultipartBuilder<Domain, Path, Params, Query, Response, Preset | NewPreset>
+        withPreset<NewPreset extends string>(preset: NewPreset): MultipartBuilder<Domain, Path, Params, Query, Response, Preset | NewPreset>
+
+
+        build(): Multipart<Domain, Path, Params, Query, Response, Preset>
     }
 export function Multipart
     <Path extends string, Domain extends string = ''>
@@ -85,10 +81,9 @@ export function Multipart
         pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number, any, any, any>>>,
         pito.Any,
         pito.Any,
-        pito.Any,
         never
     > {
-    const paramKeys = path.match(/:[a-zA-Z_\-]+/g);
+    const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
     return {
         working: {
@@ -99,15 +94,11 @@ export function Multipart
             params: pito.Obj(params),
             query: pito.Any(),
             headers: pito.Any(),
-            response : pito.Any(),
+            response: pito.Any(),
             presets: [],
         },
         withParams(params) {
             this.working.params = params as any
-            return this as any
-        },
-        withHeaders(headers) {
-            this.working.headers = headers as any
             return this as any
         },
         withQuery(query) {
@@ -118,8 +109,9 @@ export function Multipart
             this.working.response = response as any
             return this as any
         },
-        withPresets(...presets) {
-            this.working.presets = presets as any
+        withPreset(preset: any) {
+            // @ts-expect-error
+            this.working.presets.push(preset)
             return this as any
         },
         build() {

@@ -1,8 +1,7 @@
-import { pito } from "pito";
-import { PitoHeader } from "./headers";
-import { MethodSSE, MethodWS } from "./methods";
-import { Presets } from "./preset";
-import { ParseRouteKeys } from "./utils";
+import { pito } from "pito"
+import { MethodWS } from "./methods.js"
+import { AnyPresets, KnownPresets } from "./preset.js"
+import { ParseRouteKeys } from "./utils.js"
 
 
 export type WS
@@ -10,15 +9,14 @@ export type WS
     Domain extends string,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-    Headers extends pito = PitoHeader,
     Query extends pito = pito,
     // 
     Send extends pito = pito,
     Recv extends pito = pito,
-    Request extends Record<string, { args: pito, return: pito }> = {},
-    Response extends Record<string, { args: pito, return: pito }> = {},
+    Request extends Record<string, { args: [...pito[]], return: pito }> = {},
+    Response extends Record<string, { args:  [...pito[]], return: pito }> = {},
     // 
-    Preset extends Presets = undefined,
+    Preset extends AnyPresets = never,
     > = {
         domain: Domain,
         method: MethodWS,
@@ -36,7 +34,7 @@ export type WS
     }
 export type InferWS<T> = T extends WS<
     infer Domain, infer Path,
-    infer Params, infer Headers, infer Query,
+    infer Params, infer Query,
     infer Send, infer Recv,
     infer Request, infer Response,
     infer Preset>
@@ -59,53 +57,48 @@ export type WSBuilder
     Domain extends string,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-    Headers extends pito,
     Query extends pito,
     Send extends pito,
     Recv extends pito,
-    Request extends Record<string, { args: pito, return: pito }>,
-    Response extends Record<string, { args: pito, return: pito }>,
-    Preset extends Presets,
+    Request extends Record<string, { args:  [...pito[]], return: pito }>,
+    Response extends Record<string, { args:  [...pito[]], return: pito }>,
+    Preset extends AnyPresets,
     > = {
-        working: WS<Domain, Path, Params, Headers, Query, Send, Recv, Request, Response, Preset>
+        working: WS<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset>
         withParams
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : WSBuilder<Domain, Path, NewParams, Headers, Query, Send, Recv, Request, Response, Preset>
-        withHeaders
-            <NewHeaders extends pito>
-            (headers: NewHeaders)
-            : WSBuilder<Domain, Path, Params, NewHeaders, Query, Send, Recv, Request, Response, Preset>
+            : WSBuilder<Domain, Path, NewParams, Query, Send, Recv, Request, Response, Preset>
+
         withQuery
             <NewQuery extends pito>
             (query: NewQuery)
-            : WSBuilder<Domain, Path, Params, Headers, NewQuery, Send, Recv, Request, Response, Preset>
+            : WSBuilder<Domain, Path, Params, NewQuery, Send, Recv, Request, Response, Preset>
 
         withSend
             <NewSend extends pito>
             (send: NewSend)
-            : WSBuilder<Domain, Path, Params, Headers, Query, NewSend, Recv, Request, Response, Preset>
+            : WSBuilder<Domain, Path, Params, Query, NewSend, Recv, Request, Response, Preset>
 
         withRecv
             <NewRecv extends pito>
             (recv: NewRecv)
-            : WSBuilder<Domain, Path, Params, Headers, Query, Send, NewRecv, Request, Response, Preset>
+            : WSBuilder<Domain, Path, Params, Query, Send, NewRecv, Request, Response, Preset>
 
         withRequest
-            <NewRequest extends Record<string, { args: pito, return: pito }>>
+            <NewRequest extends Record<string, { args:  [...pito[]], return: pito }>>
             (request: NewRequest)
-            : WSBuilder<Domain, Path, Params, Headers, Query, Send, Recv, NewRequest, Response, Preset>
+            : WSBuilder<Domain, Path, Params, Query, Send, Recv, NewRequest, Response, Preset>
 
         withResponse
-            <NewResponse extends Record<string, { args: pito, return: pito }>>
+            <NewResponse extends Record<string, { args:  [...pito[]], return: pito }>>
             (response: NewResponse)
-            : WSBuilder<Domain, Path, Params, Headers, Query, Send, Recv, Request, NewResponse, Preset>
+            : WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, NewResponse, Preset>
 
-        withPresets
-            <NewPresets extends Presets[]>
-            (...presets: NewPresets)
-            : WSBuilder<Domain, Path, Params, Headers, Query, Send, Recv, Request, Response, NewPresets[number]>
-        build(): WS<Domain, Path, Params, Headers, Query, Send, Recv, Request, Response, Preset>
+        withPreset<NewPreset extends KnownPresets>(preset: NewPreset): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset | NewPreset>
+        withPreset<NewPreset extends string>(preset: NewPreset): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset | NewPreset>
+
+        build(): WS<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset>
     }
 
 export function WS
@@ -118,12 +111,11 @@ export function WS
         pito.Any,
         pito.Any,
         pito.Any,
-        pito.Any,
         {},
         {},
         never
     > {
-    const paramKeys = path.match(/:[a-zA-Z_\-]+/g);
+    const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
     return {
         working: {
@@ -133,7 +125,6 @@ export function WS
             // @ts-expect-error
             params: pito.Obj(params),
             query: pito.Any(),
-            headers: pito.Any(),
             send: pito.Any(),
             recv: pito.Any(),
             request: {},
@@ -142,11 +133,6 @@ export function WS
         },
         withParams(params) {
             this.working.params = params as any
-            return this as any
-        },
-
-        withHeaders(headers) {
-            this.working.headers = headers as any
             return this as any
         },
 
@@ -175,8 +161,10 @@ export function WS
             return this as any
         },
 
-        withPresets(...presets) {
-            this.working.presets = presets as any
+
+        withPreset(preset: any) {
+            // @ts-expect-error
+            this.working.presets.push(preset)
             return this as any
         },
 

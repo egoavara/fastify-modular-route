@@ -4,9 +4,6 @@ import { HTTPNoBody } from '../cjs'
 
 
 tap.test('builder', async t => {
-    const header = pito.Obj({
-        Help: pito.Regex('^Help [a-zA-Z_\-]+')
-    })
     const query = pito.Obj({
         Q: pito.Num()
     })
@@ -17,7 +14,6 @@ tap.test('builder', async t => {
 
 
     const def = HTTPNoBody("GET", "/a/b/:c/d", 'Test')
-        .withHeaders(header)
         .withParams(param)
         .withQuery(query)
         .withResponse(res)
@@ -26,10 +22,6 @@ tap.test('builder', async t => {
     t.same(
         def.domain,
         'Test',
-    )
-    t.same(
-        pito.strict(def.headers),
-        pito.strict(header),
     )
     t.same(
         pito.strict(def.params),
@@ -59,7 +51,7 @@ tap.test('builder no param', async t => {
 })
 tap.test('presets', async t => {
     const noPreset = HTTPNoBody("GET", "/a/b/c/d").build()
-    const morePresets = HTTPNoBody("GET", "/a/b/c/d").withPresets('a', 'b').build()
+    const morePresets = HTTPNoBody("GET", "/a/b/c/d").withPreset('a').withPreset('b').build()
     t.same(noPreset.presets, [])
     t.same(morePresets.presets, ['a', 'b'])
 })
