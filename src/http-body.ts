@@ -66,8 +66,9 @@ export type HTTPBodyBuilder
             (response: NewResponse)
             : HTTPBodyBuilder<Domain, Method, Path, Params, Query, Body, NewResponse, Preset>
 
-        withPreset<NewPreset extends KnownPresets>(preset: NewPreset): HTTPBodyBuilder<Domain, Method, Path, Params, Query, Body, Response, Preset | NewPreset>
-        withPreset<NewPreset extends string>(preset: NewPreset): HTTPBodyBuilder<Domain, Method, Path, Params, Query, Body, Response, Preset | NewPreset>
+        addPreset<NewPreset extends KnownPresets>(preset: NewPreset): HTTPBodyBuilder<Domain, Method, Path, Params, Query, Body, Response, Preset | NewPreset>
+        addPreset<NewPreset extends string>(preset: NewPreset): HTTPBodyBuilder<Domain, Method, Path, Params, Query, Body, Response, Preset | NewPreset>
+        withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): HTTPBodyBuilder<Domain, Method, Path, Params, Query, Body, Response, NewPresets[number]>
 
         build(): HTTPBody<Domain, Method, Path, Params, Query, Body, Response, Preset>
     }
@@ -116,9 +117,14 @@ export function HTTPBody
             this.working.response = response as any
             return this as any
         },
-        withPreset(preset: any) {
+        addPreset(preset: any) {
             // @ts-expect-error
             this.working.presets.push(preset)
+            return this as any
+        },
+        withPresets(...presets) {
+            // @ts-expect-error
+            this.working.presets = presets
             return this as any
         },
         build() {

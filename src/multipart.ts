@@ -30,7 +30,7 @@ export type Multipart
         response: Response,
         presets: Preset[],
     }
-export type InferMultipart<T> = T extends Multipart<infer Domain, infer Path, infer Params,  infer Query, infer Response, infer Preset>
+export type InferMultipart<T> = T extends Multipart<infer Domain, infer Path, infer Params, infer Query, infer Response, infer Preset>
     ? {
         Domain: Domain,
         Path: Path,
@@ -66,8 +66,9 @@ export type MultipartBuilder
             : MultipartBuilder<Domain, Path, Params, Query, NewResponse, Preset>
 
 
-        withPreset<NewPreset extends KnownPresets>(preset: NewPreset): MultipartBuilder<Domain, Path, Params, Query, Response, Preset | NewPreset>
-        withPreset<NewPreset extends string>(preset: NewPreset): MultipartBuilder<Domain, Path, Params, Query, Response, Preset | NewPreset>
+        addPreset<NewPreset extends KnownPresets>(preset: NewPreset): MultipartBuilder<Domain, Path, Params, Query, Response, Preset | NewPreset>
+        addPreset<NewPreset extends string>(preset: NewPreset): MultipartBuilder<Domain, Path, Params, Query, Response, Preset | NewPreset>
+        withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): MultipartBuilder<Domain, Path, Params, Query, Response, NewPresets[number]>
 
 
         build(): Multipart<Domain, Path, Params, Query, Response, Preset>
@@ -109,9 +110,14 @@ export function Multipart
             this.working.response = response as any
             return this as any
         },
-        withPreset(preset: any) {
+        addPreset(preset: any) {
             // @ts-expect-error
             this.working.presets.push(preset)
+            return this as any
+        },
+        withPresets(...presets) {
+            // @ts-expect-error
+            this.working.presets = presets
             return this as any
         },
         build() {

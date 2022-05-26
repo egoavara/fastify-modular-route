@@ -51,7 +51,9 @@ tap.test('builder no param', async t => {
 })
 tap.test('presets', async t => {
     const noPreset = HTTPNoBody("GET", "/a/b/c/d").build()
-    const morePresets = HTTPNoBody("GET", "/a/b/c/d").withPreset('a').withPreset('b').build()
+    const morePresets = HTTPNoBody("GET", "/a/b/c/d").addPreset('a').addPreset('b').build()
+    const morePresets2 = HTTPNoBody("GET", "/a/b/c/d").withPresets('a', 'b').build()
     t.same(noPreset.presets, [])
     t.same(morePresets.presets, ['a', 'b'])
+    t.same(morePresets2.presets, ['a', 'b'])
 })

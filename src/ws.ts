@@ -95,8 +95,9 @@ export type WSBuilder
             (response: NewResponse)
             : WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, NewResponse, Preset>
 
-        withPreset<NewPreset extends KnownPresets>(preset: NewPreset): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset | NewPreset>
-        withPreset<NewPreset extends string>(preset: NewPreset): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset | NewPreset>
+        addPreset<NewPreset extends KnownPresets>(preset: NewPreset): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset | NewPreset>
+        addPreset<NewPreset extends string>(preset: NewPreset): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset | NewPreset>
+        withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, NewPresets[number]>
 
         build(): WS<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset>
     }
@@ -162,9 +163,14 @@ export function WS
         },
 
 
-        withPreset(preset: any) {
+        addPreset(preset: any) {
             // @ts-expect-error
             this.working.presets.push(preset)
+            return this as any
+        },
+        withPresets(...presets) {
+            // @ts-expect-error
+            this.working.presets = presets
             return this as any
         },
 

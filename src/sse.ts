@@ -59,8 +59,9 @@ export type SSEBuilder
             : SSEBuilder<Domain, Path, Params, Query, NewPacket, Preset>
 
 
-        withPreset<NewPreset extends KnownPresets>(preset: NewPreset): SSEBuilder<Domain, Path, Params, Query, Packet, Preset | NewPreset>
-        withPreset<NewPreset extends string>(preset: NewPreset): SSEBuilder<Domain, Path, Params, Query, Packet, Preset | NewPreset>
+        addPreset<NewPreset extends KnownPresets>(preset: NewPreset): SSEBuilder<Domain, Path, Params, Query, Packet, Preset | NewPreset>
+        addPreset<NewPreset extends string>(preset: NewPreset): SSEBuilder<Domain, Path, Params, Query, Packet, Preset | NewPreset>
+        withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): SSEBuilder<Domain, Path, Params, Query, Packet, NewPresets[number]>
 
         build(): SSE<Domain, Path, Params, Query, Packet, Preset>
     }
@@ -101,9 +102,14 @@ export function SSE
             this.working.packet = packet as any
             return this as any
         },
-        withPreset(preset: any) {
+        addPreset(preset: any) {
             // @ts-expect-error
             this.working.presets.push(preset)
+            return this as any
+        },
+        withPresets(...presets) {
+            // @ts-expect-error
+            this.working.presets = presets
             return this as any
         },
         build() {

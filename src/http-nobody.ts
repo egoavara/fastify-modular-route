@@ -59,8 +59,9 @@ export type HTTPNoBodyBuilder
             (response: NewResponse)
             : HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, NewResponse, Preset>
 
-        withPreset<NewPreset extends KnownPresets>(preset: NewPreset): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, Preset | NewPreset>
-        withPreset<NewPreset extends string>(preset: NewPreset): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, Preset | NewPreset>
+        addPreset<NewPreset extends KnownPresets>(preset: NewPreset): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, Preset | NewPreset>
+        addPreset<NewPreset extends string>(preset: NewPreset): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, Preset | NewPreset>
+        withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, NewPresets[number]>
 
         build(): HTTPNoBody<Domain, Method, Path, Params, Query, Response, Preset>
     }
@@ -102,9 +103,14 @@ export function HTTPNoBody
             this.working.response = response as any
             return this as any
         },
-        withPreset(preset: any) {
+        addPreset(preset: any) {
             // @ts-expect-error
             this.working.presets.push(preset)
+            return this as any
+        },
+        withPresets(...presets) {
+            // @ts-expect-error
+            this.working.presets = presets
             return this as any
         },
         build() {
