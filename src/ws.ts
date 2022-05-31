@@ -99,7 +99,7 @@ export type WSBuilder
         addPreset<NewPreset extends string>(preset: NewPreset): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset | NewPreset>
         withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, NewPresets[number]>
 
-        build(): WS<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset>
+        build(): WS<Domain, Path, Params, Query, Send, Recv, Request, Response, 'ws' | Preset>
     }
 
 export function WS
@@ -175,6 +175,9 @@ export function WS
         },
 
         build() {
+            // @ts-expect-error
+            this.working.presets.push('ws')
+            this.working.presets = Array.from(new Set(this.working.presets))
             return this.working
         }
 

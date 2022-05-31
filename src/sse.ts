@@ -63,7 +63,7 @@ export type SSEBuilder
         addPreset<NewPreset extends string>(preset: NewPreset): SSEBuilder<Domain, Path, Params, Query, Packet, Preset | NewPreset>
         withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): SSEBuilder<Domain, Path, Params, Query, Packet, NewPresets[number]>
 
-        build(): SSE<Domain, Path, Params, Query, Packet, Preset>
+        build(): SSE<Domain, Path, Params, Query, Packet, 'http' | 'sse' | Preset>
     }
 
 export function SSE
@@ -113,6 +113,9 @@ export function SSE
             return this as any
         },
         build() {
+            // @ts-expect-error
+            this.working.presets.push('http', 'sse')
+            this.working.presets = Array.from(new Set(this.working.presets))
             return this.working
         }
 

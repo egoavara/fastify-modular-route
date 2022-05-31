@@ -1,6 +1,9 @@
 export type KnownPresets =
     | 'jwt-bearer'
-    | 'manual-authid'
+    | 'http'
+    | 'multipart'
+    | 'sse'
+    | 'ws'
 export type AnyPresets =
     | KnownPresets
     | (string & Record<never, never>)

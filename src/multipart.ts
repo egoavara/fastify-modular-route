@@ -71,7 +71,7 @@ export type MultipartBuilder
         withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): MultipartBuilder<Domain, Path, Params, Query, Response, NewPresets[number]>
 
 
-        build(): Multipart<Domain, Path, Params, Query, Response, Preset>
+        build(): Multipart<Domain, Path, Params, Query, Response, 'http' | 'multipart' | Preset>
     }
 export function Multipart
     <Path extends string, Domain extends string = ''>
@@ -121,6 +121,9 @@ export function Multipart
             return this as any
         },
         build() {
+            // @ts-expect-error
+            this.working.presets.push('http', 'multipart')
+            this.working.presets = Array.from(new Set(this.working.presets))
             return this.working
         }
 

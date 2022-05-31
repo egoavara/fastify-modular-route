@@ -63,7 +63,7 @@ export type HTTPNoBodyBuilder
         addPreset<NewPreset extends string>(preset: NewPreset): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, Preset | NewPreset>
         withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, NewPresets[number]>
 
-        build(): HTTPNoBody<Domain, Method, Path, Params, Query, Response, Preset>
+        build(): HTTPNoBody<Domain, Method, Path, Params, Query, Response, 'http' | Preset>
     }
 export function HTTPNoBody
     <Method extends MethodHTTPNoBody, Path extends string, Domain extends string = ''>
@@ -114,6 +114,9 @@ export function HTTPNoBody
             return this as any
         },
         build() {
+            // @ts-expect-error
+            this.working.presets.push('http')
+            this.working.presets = Array.from(new Set(this.working.presets))
             return this.working
         }
 

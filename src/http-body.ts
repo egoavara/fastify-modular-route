@@ -70,7 +70,7 @@ export type HTTPBodyBuilder
         addPreset<NewPreset extends string>(preset: NewPreset): HTTPBodyBuilder<Domain, Method, Path, Params, Query, Body, Response, Preset | NewPreset>
         withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): HTTPBodyBuilder<Domain, Method, Path, Params, Query, Body, Response, NewPresets[number]>
 
-        build(): HTTPBody<Domain, Method, Path, Params, Query, Body, Response, Preset>
+        build(): HTTPBody<Domain, Method, Path, Params, Query, Body, Response, 'http' | Preset>
     }
 
 
@@ -128,6 +128,9 @@ export function HTTPBody
             return this as any
         },
         build() {
+            // @ts-expect-error
+            this.working.presets.push('http')
+            this.working.presets = Array.from(new Set(this.working.presets))
             return this.working
         }
 

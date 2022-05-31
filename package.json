@@ -1,6 +1,6 @@
 {
   "name": "fastify-modular-route",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "route template for fastify-modular ",
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
