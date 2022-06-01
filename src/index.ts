@@ -16,24 +16,24 @@ export * from './utils.js'
 export * from './ws.js'
 
 export type Route =
-    | HTTPBody<string, MethodHTTPBody, string, any, any, any, any, any>
-    | HTTPNoBody<string, MethodHTTPNoBody, string, any, any, any, any>
-    | Multipart<string, string, any, any, any, any>
-    | SSE<string, string, any, any, any, any>
-    | WS<string, string, any, any, any, any, any, any, any>
+    | HTTPBody<string, string, MethodHTTPBody, any, any, any, any, any>
+    | HTTPNoBody<string, string, MethodHTTPNoBody, any, any, any, any>
+    | Multipart<string, string, string, any, any, any>
+    | SSE<string, string, string, any, any, any>
+    | WS<string, string, string, any, any, any, any, any, any>
 export type InferPrefix<R extends Route> =
-    R extends HTTPBody<string, MethodHTTPBody, string, any, any, any, any, infer Prefix>
+    R extends HTTPBody<string, infer Prefix, MethodHTTPBody, any, any, any, any, any>
     ? Prefix
-    : R extends HTTPNoBody<string, MethodHTTPNoBody, string, any, any, any, infer Prefix>
+    : R extends HTTPNoBody<string, infer Prefix, MethodHTTPNoBody, any, any, any, any>
     ? Prefix
-    : R extends Multipart<string, string, any, any, any, infer Prefix>
+    : R extends Multipart<string, infer Prefix, any, any, any, any>
     ? Prefix
-    : R extends SSE<string, string, any, any, any, infer Prefix>
+    : R extends SSE<string, infer Prefix, any, any, any, any>
     ? Prefix
-    : R extends WS<string, string, any, any, any, any, any, any, infer Prefix>
+    : R extends WS<string, infer Prefix, any, any, any, any, any, any, any>
     ? Prefix
     : never
 
-export function wsCaller<Caller extends Record<string, { args: [pito] | [...pito[]], return: pito }>>(caller: Caller): Caller {
+export function func<Caller extends Record<string, { args: [pito] | [...pito[]], return: pito }>>(caller: Caller): Caller {
     return caller
 }

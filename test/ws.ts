@@ -1,6 +1,7 @@
+import { randomBytes } from 'crypto'
 import { pito } from 'pito'
 import tap from 'tap'
-import { InferWS, WS, wsCaller } from '../cjs'
+import { WS, func } from '../cjs'
 
 tap.test('builder', async t => {
     const query = pito.Obj({
@@ -11,15 +12,15 @@ tap.test('builder', async t => {
     })
     const send = pito.Str()
     const recv = pito.Num()
-    const req = wsCaller({ a: { args: [], return: pito.Num() } })
-    const res = wsCaller({ b: { args: [pito.Num()], return: pito.Num() } })
+    const req = func({ a: { args: [], return: pito.Num() } })
+    const res = func({ b: { args: [pito.Num()], return: pito.Num() } })
     const def = WS("/a/b/:c/d", 'WS')
-        .withParams(param)
-        .withQuery(query)
-        .withSend(send)
-        .withRecv(recv)
-        .withRequest(req)
-        .withResponse(res)
+        .params(param)
+        .query(query)
+        .send(send)
+        .recv(recv)
+        .request(req)
+        .response(res)
         .build()
     t.same(
         def.domain,
@@ -50,6 +51,23 @@ tap.test('builder', async t => {
         res
     )
 })
+
+tap.test('meta', async t => {
+    const description = randomBytes(10).toString('hex')
+    const summary = randomBytes(10).toString('hex')
+    const url = `http://www.${randomBytes(2).toString('hex')}.com`
+    const urlDesc = randomBytes(10).toString('hex')
+    const def = WS("/a/b/c/d")
+        .description(description)
+        .summary(summary)
+        .build()
+
+    t.same(def.description, description,)
+    t.same(def.summary, summary,)
+    t.same(WS("/a/b/c/d").externalDocs(url).build().externalDocs, { url: url })
+    t.same(WS("/a/b/c/d").externalDocs(url, urlDesc).build().externalDocs, { url: url, description: urlDesc })
+})
+
 tap.test('builder other branch', async t => {
     const def = WS("/a/b/c/d").build()
 
@@ -64,8 +82,8 @@ tap.test('builder other branch', async t => {
 })
 tap.test('presets', async t => {
     const noPreset = WS("/a/b/c/d").build()
-    const morePresets = WS("/a/b/c/d").addPreset('a').addPreset('b').build()
-    const morePresets2 = WS("/a/b/c/d").withPresets('a', 'b').build()
+    const morePresets = WS("/a/b/c/d").presets('a').presets('b').build()
+    const morePresets2 = WS("/a/b/c/d").presets('a', 'b').build()
     t.same(new Set(noPreset.presets), new Set(['ws']))
     t.same(new Set(morePresets.presets), new Set(['a', 'b', 'ws']))
     t.same(new Set(morePresets2.presets), new Set(['a', 'b', 'ws']))

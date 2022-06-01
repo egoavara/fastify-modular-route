@@ -7,54 +7,39 @@ import { ParseRouteKeys } from "./utils.js"
 export type WS
     <
     Domain extends string,
+    Presets extends AnyPresets,
     Path extends string,
+
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Query extends pito = pito,
-    // 
     Send extends pito = pito,
     Recv extends pito = pito,
     Request extends Record<string, { args: [...pito[]], return: pito }> = {},
     Response extends Record<string, { args: [...pito[]], return: pito }> = {},
     // 
-    Preset extends AnyPresets = never,
     > = {
-        domain: Domain,
-        method: MethodWS,
-        path: Path,
+        readonly domain: Domain
+        presets: Presets[]
+        description?: string
+        summary?: string
+        externalDocs?: { url: string, description?: string }
+
+        readonly method: MethodWS,
+        readonly path: Path,
+
         params: Params,
-        headers: Headers,
         query: Query,
-        // 
         send: Send,
         recv: Recv,
         request: Request,
         response: Response,
         // 
-        presets: Preset[],
     }
-export type InferWS<T> = T extends WS<
-    infer Domain, infer Path,
-    infer Params, infer Query,
-    infer Send, infer Recv,
-    infer Request, infer Response,
-    infer Preset>
-    ? {
-        Domain: Domain,
-        Path: Path,
-        Params: Params,
-        Headers: Headers,
-        Query: Query,
-        Send: Send,
-        Recv: Recv,
-        Request: Request,
-        Response: Response,
-        Preset: Preset,
-    }
-    : never
 
 export type WSBuilder
     <
     Domain extends string,
+    Presets extends AnyPresets,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Query extends pito,
@@ -62,44 +47,44 @@ export type WSBuilder
     Recv extends pito,
     Request extends Record<string, { args: [...pito[]], return: pito }>,
     Response extends Record<string, { args: [...pito[]], return: pito }>,
-    Preset extends AnyPresets,
     > = {
-        working: WS<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset>
-        withParams
+        presets<NewPresets extends KnownPresets>(preset: NewPresets): WSBuilder<Domain, Presets | NewPresets, Path, Params, Query, Send, Recv, Request, Response>
+        presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): WSBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Send, Recv, Request, Response>
+        description(contents: string): WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response>
+        summary(contents: string): WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response>
+        externalDocs(url: string, description?: string): WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response>
+        // 
+        params
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : WSBuilder<Domain, Path, NewParams, Query, Send, Recv, Request, Response, Preset>
+            : WSBuilder<Domain, Presets, Path, NewParams, Query, Send, Recv, Request, Response>
 
-        withQuery
+        query
             <NewQuery extends pito>
             (query: NewQuery)
-            : WSBuilder<Domain, Path, Params, NewQuery, Send, Recv, Request, Response, Preset>
+            : WSBuilder<Domain, Presets, Path, Params, NewQuery, Send, Recv, Request, Response>
 
-        withSend
+        send
             <NewSend extends pito>
             (send: NewSend)
-            : WSBuilder<Domain, Path, Params, Query, NewSend, Recv, Request, Response, Preset>
+            : WSBuilder<Domain, Presets, Path, Params, Query, NewSend, Recv, Request, Response>
 
-        withRecv
+        recv
             <NewRecv extends pito>
             (recv: NewRecv)
-            : WSBuilder<Domain, Path, Params, Query, Send, NewRecv, Request, Response, Preset>
+            : WSBuilder<Domain, Presets, Path, Params, Query, Send, NewRecv, Request, Response>
 
-        withRequest
+        request
             <NewRequest extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
             (request: NewRequest)
-            : WSBuilder<Domain, Path, Params, Query, Send, Recv, NewRequest, Response, Preset>
+            : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, NewRequest, Response>
 
-        withResponse
+        response
             <NewResponse extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
             (response: NewResponse)
-            : WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, NewResponse, Preset>
+            : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, NewResponse>
 
-        addPreset<NewPreset extends KnownPresets>(preset: NewPreset): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset | NewPreset>
-        addPreset<NewPreset extends string>(preset: NewPreset): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, Preset | NewPreset>
-        withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): WSBuilder<Domain, Path, Params, Query, Send, Recv, Request, Response, NewPresets[number]>
-
-        build(): WS<Domain, Path, Params, Query, Send, Recv, Request, Response, 'ws' | Preset>
+        build(): WS<Domain, 'ws' | Presets, Path, Params, Query, Send, Recv, Request, Response>
     }
 
 export function WS
@@ -107,78 +92,84 @@ export function WS
     (path: Path, domain?: Domain)
     : WSBuilder<
         Domain,
+        'ws',
         Path,
         pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number, any, any, any>>>,
         pito.Any,
         pito.Any,
         pito.Any,
         {},
-        {},
-        never
+        {}
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
+    const target: WS<Domain, string, Path, pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>, pito.Any, pito.Any, pito.Any, {}, {}> = {
+        // @ts-expect-error
+        domain: domain ?? '',
+        method: 'WS',
+        presets: ['ws'],
+        path: path,
+        // @ts-expect-error
+        params: pito.Obj(params),
+        query: pito.Any(),
+        send: pito.Any(),
+        recv: pito.Any(),
+        request: {},
+        response: {},
+    }
     return {
-        working: {
-            domain: (domain ?? '') as Domain,
-            method: 'WS',
-            path: path,
-            // @ts-expect-error
-            params: pito.Obj(params),
-            query: pito.Any(),
-            send: pito.Any(),
-            recv: pito.Any(),
-            request: {},
-            response: {},
-            presets: [],
+        // @ts-expect-error
+        presets(...presets) {
+            target.presets.push(...presets)
+            return this
         },
-        withParams(params) {
-            this.working.params = params as any
+        description(contents) {
+            target.description = contents
+            return this
+        },
+        summary(contents) {
+            target.summary = contents
+            return this
+        },
+        externalDocs(url, description?) {
+            target.externalDocs = { url, ...(description !== undefined ? { description } : {}) }
+            return this
+        },
+        params(params) {
+            target.params = params as any
             return this as any
         },
 
-        withQuery(query) {
-            this.working.query = query as any
+        query(query) {
+            target.query = query as any
             return this as any
         },
 
-        withRecv(recv) {
-            this.working.recv = recv as any
+        recv(recv) {
+            target.recv = recv as any
             return this as any
         },
 
-        withSend(send) {
-            this.working.send = send as any
+        send(send) {
+            target.send = send as any
             return this as any
         },
 
-        withRequest(request) {
-            this.working.request = request as any
+        request(request) {
+            target.request = request as any
             return this as any
         },
 
-        withResponse(response) {
-            this.working.response = response as any
+        response(response) {
+            target.response = response as any
             return this as any
         },
 
 
-        addPreset(preset: any) {
-            // @ts-expect-error
-            this.working.presets.push(preset)
-            return this as any
-        },
-        withPresets(...presets) {
-            // @ts-expect-error
-            this.working.presets = presets
-            return this as any
-        },
-
+        // @ts-expect-error
         build() {
-            // @ts-expect-error
-            this.working.presets.push('ws')
-            this.working.presets = Array.from(new Set(this.working.presets))
-            return this.working
+            target.presets = Array.from(new Set([...target.presets, 'ws']))
+            return target
         }
 
     }

@@ -14,117 +14,115 @@ export type LimitFile = {
 export type Multipart
     <
     Domain extends string,
+    Presets extends AnyPresets,
+
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-
     Query extends pito = pito,
     Response extends pito = pito.Any,
-    Preset extends AnyPresets = never,
     > = {
-        domain: Domain,
-        method: 'MULTIPART',
-        path: Path,
-        params: Params,
+        readonly domain: Domain
+        presets: Presets[]
+        description?: string
+        summary?: string
+        externalDocs?: { url: string, description?: string }
 
+        readonly method: 'MULTIPART',
+        readonly path: Path,
+        params: Params,
         query: Query,
         response: Response,
-        presets: Preset[],
     }
-export type InferMultipart<T> = T extends Multipart<infer Domain, infer Path, infer Params, infer Query, infer Response, infer Preset>
-    ? {
-        Domain: Domain,
-        Path: Path,
-        Params: Params,
-        Query: Query,
-        Response: Response,
-        Preset: Preset
-    }
-    : never
 
 export type MultipartBuilder
     <
     Domain extends string,
+    Presets extends AnyPresets,
     Path extends string,
-    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
 
+    Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Query extends pito,
     Response extends pito,
-    Preset extends AnyPresets,
     > = {
-        working: Multipart<Domain, Path, Params, Query, Response, Preset>
-        withParams
+        presets<NewPresets extends KnownPresets>(preset: NewPresets): MultipartBuilder<Domain, Presets | NewPresets, Path, Params, Query, Response>
+        presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): MultipartBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Response>
+        description(contents: string): MultipartBuilder<Domain, Presets, Path, Params, Query, Response>
+        summary(contents: string): MultipartBuilder<Domain, Presets, Path, Params, Query, Response>
+        externalDocs(url: string, description?: string): MultipartBuilder<Domain, Presets, Path, Params, Query, Response>
+        // 
+        params
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : MultipartBuilder<Domain, Path, NewParams, Query, Response, Preset>
-        withQuery
+            : MultipartBuilder<Domain, Presets, Path, NewParams, Query, Response>
+        query
             <NewQuery extends pito.Obj<Record<string, pito>>>
             (query: NewQuery)
-            : MultipartBuilder<Domain, Path, Params, NewQuery, Response, Preset>
-        withResponse
+            : MultipartBuilder<Domain, Presets, Path, Params, NewQuery, Response>
+        response
             <NewResponse extends pito>
             (response: NewResponse)
-            : MultipartBuilder<Domain, Path, Params, Query, NewResponse, Preset>
+            : MultipartBuilder<Domain, Presets, Path, Params, Query, NewResponse>
 
-
-        addPreset<NewPreset extends KnownPresets>(preset: NewPreset): MultipartBuilder<Domain, Path, Params, Query, Response, Preset | NewPreset>
-        addPreset<NewPreset extends string>(preset: NewPreset): MultipartBuilder<Domain, Path, Params, Query, Response, Preset | NewPreset>
-        withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): MultipartBuilder<Domain, Path, Params, Query, Response, NewPresets[number]>
-
-
-        build(): Multipart<Domain, Path, Params, Query, Response, 'http' | 'multipart' | Preset>
+        build(): Multipart<Domain, 'http' | 'multipart' | Presets, Path, Params, Query, Response>
     }
 export function Multipart
     <Path extends string, Domain extends string = ''>
     (path: Path, domain?: Domain)
     : MultipartBuilder<
         Domain,
+        'http' | 'multipart',
         Path,
         pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number, any, any, any>>>,
         pito.Any,
-        pito.Any,
-        never
+        pito.Any
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
+    const target: Multipart<Domain, string, Path, pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>, pito.Any, pito.Any> = {
+        // @ts-expect-error
+        domain: domain ?? '',
+        method: 'MULTIPART',
+        presets: ['http', 'multipart'],
+        path: path,
+        // @ts-expect-error
+        params: pito.Obj(params),
+        query: pito.Any(),
+        response: pito.Any(),
+    }
     return {
-        working: {
-            domain: (domain ?? '') as Domain,
-            path: path,
-            method: "MULTIPART",
-            // @ts-expect-error
-            params: pito.Obj(params),
-            query: pito.Any(),
-            headers: pito.Any(),
-            response: pito.Any(),
-            presets: [],
+        // @ts-expect-error
+        presets(...presets) {
+            target.presets.push(...presets)
+            return this
         },
-        withParams(params) {
-            this.working.params = params as any
+        description(contents) {
+            target.description = contents
+            return this
+        },
+        summary(contents) {
+            target.summary = contents
+            return this
+        },
+        externalDocs(url, description?) {
+            target.externalDocs = { url, ...(description !== undefined ? { description } : {}) }
+            return this
+        },
+        params(params) {
+            target.params = params as any
             return this as any
         },
-        withQuery(query) {
-            this.working.query = query as any
+        query(query) {
+            target.query = query as any
             return this as any
         },
-        withResponse(response) {
-            this.working.response = response as any
+        response(response) {
+            target.response = response as any
             return this as any
         },
-        addPreset(preset: any) {
-            // @ts-expect-error
-            this.working.presets.push(preset)
-            return this as any
-        },
-        withPresets(...presets) {
-            // @ts-expect-error
-            this.working.presets = presets
-            return this as any
-        },
+        // @ts-expect-error
         build() {
-            // @ts-expect-error
-            this.working.presets.push('http', 'multipart')
-            this.working.presets = Array.from(new Set(this.working.presets))
-            return this.working
+            target.presets = Array.from(new Set([...target.presets, 'http', 'multipart']))
+            return target
         }
 
     }

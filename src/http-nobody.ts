@@ -6,118 +6,116 @@ import { ParseRouteKeys } from "./utils.js"
 export type HTTPNoBody
     <
     Domain extends string,
+    Presets extends AnyPresets,
     Method extends MethodHTTPNoBody,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Query extends pito = pito,
     Response extends pito = pito,
-    Preset extends AnyPresets = never,
     > = {
-        domain: Domain,
-        method: Method,
-        path: Path,
+        readonly domain: Domain
+        presets: Presets[]
+        description?: string
+        summary?: string
+        externalDocs?: { url: string, description?: string }
+        // 
+        readonly method: Method,
+        readonly path: Path,
         params: Params,
-        headers: Headers,
         query: Query,
         response: Response,
-        presets: Preset[],
     }
-export type InferHTTPNoBody<T> = T extends HTTPNoBody<infer Domain, infer Method, infer Path, infer Params, infer Query, infer Response, infer Preset>
-    ? {
-        Domain: Domain,
-        Method: Method,
-        Path: Path,
-        Params: Params,
-        Query: Query,
-        Response: Response,
-        Preset: Preset
-    }
-    : never
 
 export type HTTPNoBodyBuilder
     <
     Domain extends string,
+    Presets extends AnyPresets,
     Method extends MethodHTTPNoBody,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-
     Query extends pito,
     Response extends pito,
-    Preset extends AnyPresets,
     > = {
-        working: HTTPNoBody<Domain, Method, Path, Params, Query, Response, Preset>
-        withParams
+        presets<NewPresets extends KnownPresets>(preset: NewPresets): HTTPNoBodyBuilder<Domain, Presets | NewPresets, Method, Path, Params, Query, Response>
+        presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): HTTPNoBodyBuilder<Domain, Presets | NewPresets[number], Method, Path, Params, Query, Response>
+        description(contents: string): HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, Query, Response>
+        summary(contents: string): HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, Query, Response>
+        externalDocs(url: string, description?: string): HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, Query, Response>
+        // 
+        params
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : HTTPNoBodyBuilder<Domain, Method, Path, NewParams, Query, Response, Preset>
-        withQuery
+            : HTTPNoBodyBuilder<Domain, Presets, Method, Path, NewParams, Query, Response>
+        query
             <NewQuery extends pito.Obj<Record<string, pito>>>
             (query: NewQuery)
-            : HTTPNoBodyBuilder<Domain, Method, Path, Params, NewQuery, Response, Preset>
-        withResponse
+            : HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, NewQuery, Response>
+        response
             <NewResponse extends pito>
             (response: NewResponse)
-            : HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, NewResponse, Preset>
+            : HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, Query, NewResponse>
 
-        addPreset<NewPreset extends KnownPresets>(preset: NewPreset): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, Preset | NewPreset>
-        addPreset<NewPreset extends string>(preset: NewPreset): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, Preset | NewPreset>
-        withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): HTTPNoBodyBuilder<Domain, Method, Path, Params, Query, Response, NewPresets[number]>
-
-        build(): HTTPNoBody<Domain, Method, Path, Params, Query, Response, 'http' | Preset>
+        build(): HTTPNoBody<Domain, 'http' | Presets, Method, Path, Params, Query, Response>
     }
 export function HTTPNoBody
     <Method extends MethodHTTPNoBody, Path extends string, Domain extends string = ''>
     (method: Method, path: Path, domain?: Domain)
     : HTTPNoBodyBuilder<
         Domain,
+        'http',
         Method,
         Path,
         pito.Obj<Record<ParseRouteKeys<Path>, pito<any, any, { type: 'string' | 'number' | 'integer' | 'boolean' }, any>>>,
-
         pito.Any,
-        pito.Any,
-        never
+        pito.Any
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
+    const target: HTTPNoBody<Domain, string, Method, Path, pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>, pito.Any, pito.Any> = {
+        // @ts-expect-error
+        domain: domain ?? '',
+        method: method,
+        presets: ['http'],
+        path: path,
+        // @ts-expect-error
+        params: pito.Obj(params),
+        query: pito.Any(),
+        response: pito.Any(),
+    }
     return {
-        working: {
-            domain: (domain ?? '') as Domain,
-            method: method,
-            path: path,
-            // @ts-expect-error
-            params: pito.Obj(params),
-            query: pito.Any(),
-            response: pito.Any(),
-            presets: [],
+        // @ts-expect-error
+        presets(...presets) {
+            target.presets.push(...presets)
+            return this
         },
-        withParams(params) {
-            this.working.params = params as any
+        description(contents) {
+            target.description = contents
+            return this
+        },
+        summary(contents) {
+            target.summary = contents
+            return this
+        },
+        externalDocs(url, description?) {
+            target.externalDocs = { url, ...(description !== undefined ? { description } : {}) }
+            return this
+        },
+        params(params) {
+            target.params = params as any
             return this as any
         },
-        withQuery(query) {
-            this.working.query = query as any
+        query(query) {
+            target.query = query as any
             return this as any
         },
-        withResponse(response) {
-            this.working.response = response as any
+        response(response) {
+            target.response = response as any
             return this as any
         },
-        addPreset(preset: any) {
-            // @ts-expect-error
-            this.working.presets.push(preset)
-            return this as any
-        },
-        withPresets(...presets) {
-            // @ts-expect-error
-            this.working.presets = presets
-            return this as any
-        },
+        // @ts-expect-error
         build() {
-            // @ts-expect-error
-            this.working.presets.push('http')
-            this.working.presets = Array.from(new Set(this.working.presets))
-            return this.working
+            target.presets = Array.from(new Set([...target.presets, 'http']))
+            return target
         }
 
     }

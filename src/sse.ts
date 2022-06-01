@@ -7,63 +7,56 @@ import { ParseRouteKeys } from "./utils.js"
 export type SSE
     <
     Domain extends string,
+    Presets extends AnyPresets,
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
     Query extends pito = pito,
     Packet extends pito = pito,
-    Preset extends AnyPresets = never,
     > = {
-        domain: Domain,
-        method: MethodSSE,
-        path: Path,
+        readonly domain: Domain
+        presets: Presets[]
+        description?: string
+        summary?: string
+        externalDocs?: { url: string, description?: string }
+
+        readonly method: MethodSSE,
+        readonly path: Path,
         params: Params,
-        headers: Headers,
         query: Query,
         packet: Packet,
-        presets: Preset[],
     }
-export type InferSSE<T> = T extends SSE<infer Domain, infer Path, infer Params, infer Query, infer Packet, infer Preset>
-    ? {
-        Domain: Domain,
-        Path: Path,
-        Params: Params,
-        Query: Query,
-        Packet: Packet,
-        Preset: Preset,
-    }
-    : never
 
 export type SSEBuilder
     <
     Domain extends string,
+    Presets extends AnyPresets,
+
     Path extends string,
     Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
-
     Query extends pito,
     Packet extends pito,
-    Preset extends AnyPresets,
     > = {
-        working: SSE<Domain, Path, Params, Query, Packet, Preset>
-        withParams
+        presets<NewPresets extends KnownPresets>(preset: NewPresets): SSEBuilder<Domain, Presets | NewPresets, Path, Params, Query, Packet>
+        presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): SSEBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Packet>
+        description(contents: string): SSEBuilder<Domain, Presets, Path, Params, Query, Packet>
+        summary(contents: string): SSEBuilder<Domain, Presets, Path, Params, Query, Packet>
+        externalDocs(url: string, description?: string): SSEBuilder<Domain, Presets, Path, Params, Query, Packet>
+        // 
+        params
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
-            : SSEBuilder<Domain, Path, NewParams, Query, Packet, Preset>
+            : SSEBuilder<Domain, Presets, Path, NewParams, Query, Packet>
 
-        withQuery
+        query
             <NewQuery extends pito>
             (query: NewQuery)
-            : SSEBuilder<Domain, Path, Params, NewQuery, Packet, Preset>
-        withPacket
+            : SSEBuilder<Domain, Presets, Path, Params, NewQuery, Packet>
+        packet
             <NewPacket extends pito>
             (packet: NewPacket)
-            : SSEBuilder<Domain, Path, Params, Query, NewPacket, Preset>
+            : SSEBuilder<Domain, Presets, Path, Params, Query, NewPacket>
 
-
-        addPreset<NewPreset extends KnownPresets>(preset: NewPreset): SSEBuilder<Domain, Path, Params, Query, Packet, Preset | NewPreset>
-        addPreset<NewPreset extends string>(preset: NewPreset): SSEBuilder<Domain, Path, Params, Query, Packet, Preset | NewPreset>
-        withPresets<NewPresets extends [string] | [...string[]]>(...preset: NewPresets): SSEBuilder<Domain, Path, Params, Query, Packet, NewPresets[number]>
-
-        build(): SSE<Domain, Path, Params, Query, Packet, 'http' | 'sse' | Preset>
+        build(): SSE<Domain, 'http' | 'sse' | Presets, Path, Params, Query, Packet>
     }
 
 export function SSE
@@ -71,52 +64,59 @@ export function SSE
     (path: Path, domain?: Domain)
     : SSEBuilder<
         Domain,
+        'http' | 'sse',
         Path,
         pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
         pito.Any,
-        pito.Any,
-        never
+        pito.Any
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
+    const target: SSE<Domain, string, Path, pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>, pito.Any, pito.Any> = {
+        // @ts-expect-error
+        domain: domain ?? '',
+        method: 'SSE',
+        presets: ['http', 'sse'],
+        path: path,
+        // @ts-expect-error
+        params: pito.Obj(params),
+        query: pito.Any(),
+        packet: pito.Any(),
+    }
     return {
-        working: {
-            domain: (domain ?? '') as Domain,
-            method: 'SSE',
-            path: path,
-            // @ts-expect-error
-            params: pito.Obj(params),
-            query: pito.Any(),
-            packet: pito.Any(),
-            presets: [],
+        // @ts-expect-error
+        presets(...presets) {
+            target.presets.push(...presets)
+            return this
         },
-        withParams(params) {
-            this.working.params = params as any
+        description(contents) {
+            target.description = contents
+            return this
+        },
+        summary(contents) {
+            target.summary = contents
+            return this
+        },
+        externalDocs(url, description?) {
+            target.externalDocs = { url, ...(description !== undefined ? { description } : {}) }
+            return this
+        },
+        params(params) {
+            target.params = params as any
             return this as any
         },
-        withQuery(query) {
-            this.working.query = query as any
+        query(query) {
+            target.query = query as any
             return this as any
         },
-        withPacket(packet) {
-            this.working.packet = packet as any
+        packet(packet) {
+            target.packet = packet as any
             return this as any
         },
-        addPreset(preset: any) {
-            // @ts-expect-error
-            this.working.presets.push(preset)
-            return this as any
-        },
-        withPresets(...presets) {
-            // @ts-expect-error
-            this.working.presets = presets
-            return this as any
-        },
+        // @ts-expect-error
         build() {
-            // @ts-expect-error
-            this.working.presets.push('http', 'sse')
-            this.working.presets = Array.from(new Set(this.working.presets))
-            return this.working
+            target.presets = Array.from(new Set([...target.presets, 'http', 'sse']))
+            return target
         }
 
     }

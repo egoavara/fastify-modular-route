@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto'
 import { pito } from 'pito'
 import tap from 'tap'
 import { SSE } from '../cjs'
@@ -11,9 +12,9 @@ tap.test('builder', async t => {
     })
     const pack = pito.Str()
     const def = SSE("/a/b/:c/d", 'SSE')
-        .withParams(param)
-        .withQuery(query)
-        .withPacket(pack)
+        .params(param)
+        .query(query)
+        .packet(pack)
         .build()
 
     t.same(
@@ -33,6 +34,24 @@ tap.test('builder', async t => {
         pito.strict(pack),
     )
 })
+
+
+tap.test('meta', async t => {
+    const description = randomBytes(10).toString('hex')
+    const summary = randomBytes(10).toString('hex')
+    const url = `http://www.${randomBytes(2).toString('hex')}.com`
+    const urlDesc = randomBytes(10).toString('hex')
+    const def = SSE("/a/b/c/d")
+        .description(description)
+        .summary(summary)
+        .build()
+
+    t.same(def.description, description,)
+    t.same(def.summary, summary,)
+    t.same(SSE("/a/b/c/d").externalDocs(url).build().externalDocs, { url: url })
+    t.same(SSE("/a/b/c/d").externalDocs(url, urlDesc).build().externalDocs, { url: url, description: urlDesc })
+})
+
 tap.test('builder other branch', async t => {
     const def = SSE("/a/b/c/d").build()
 
@@ -47,8 +66,8 @@ tap.test('builder other branch', async t => {
 })
 tap.test('presets', async t => {
     const noPreset = SSE("/a/b/c/d").build()
-    const morePresets = SSE("/a/b/c/d").addPreset('a').addPreset('b').build()
-    const morePresets2 = SSE("/a/b/c/d").withPresets('a', 'b').build()
+    const morePresets = SSE("/a/b/c/d").presets('a').presets('b').build()
+    const morePresets2 = SSE("/a/b/c/d").presets('a', 'b').build()
     t.same(new Set(noPreset.presets), new Set(['http', 'sse']))
     t.same(new Set(morePresets.presets), new Set(['a', 'b', 'http', 'sse']))
     t.same(new Set(morePresets2.presets), new Set(['a', 'b', 'http', 'sse']))
