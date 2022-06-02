@@ -19,13 +19,15 @@
     "esm/package.json"
   ],
   "scripts": {
-    "build": "pnpm build:cjs & pnpm build:esm",
+    "build": "npm run build:cjs & npm run build:esm",
     "build:cjs": "rimraf \"cjs/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -p ./cjs/tsconfig.json",
     "build:esm": "rimraf \"esm/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -p ./esm/tsconfig.json",
     "watch:cjs": "rimraf \"cjs/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc --watch -p ./cjs/tsconfig.json",
     "watch:esm": "rimraf \"esm/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc --watch -p ./esm/tsconfig.json",
     "test": "tap --node-arg=\"--loader\" --node-arg=\"ts-node/esm\"",
-    "prepack": "pnpm build && pnpm test"
+    "postversion": "npm publish",
+    "prepack": "npm run build && npm run test",
+    "prepublish": "cross-var \"git tag -a \\\"v$npm_package_version\\\" -m \\\"version $npm_package_version\\\"\""
   },
   "keywords": [
     "typescript",
@@ -37,6 +39,7 @@
   "devDependencies": {
     "@types/node": "^17.0.33",
     "@types/tap": "^15.0.6",
+    "cross-var": "^1.1.0",
     "rimraf": "^3.0.2",
     "tap": "^16.0.1",
     "ts-node": "^10.7.0",

@@ -11,10 +11,12 @@ tap.test('builder', async t => {
         c: pito.Num()
     })
     const pack = pito.Str()
+    const fail = pito.UUID()
     const def = SSE("/a/b/:c/d", 'SSE')
         .params(param)
         .query(query)
         .packet(pack)
+        .fail(fail)
         .build()
 
     t.same(
@@ -32,6 +34,10 @@ tap.test('builder', async t => {
     t.same(
         pito.strict(def.packet),
         pito.strict(pack),
+    )
+    t.same(
+        pito.strict(def.fail),
+        pito.strict(fail),
     )
 })
 

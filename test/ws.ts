@@ -14,6 +14,8 @@ tap.test('builder', async t => {
     const recv = pito.Num()
     const req = func({ a: { args: [], return: pito.Num() } })
     const res = func({ b: { args: [pito.Num()], return: pito.Num() } })
+    const fail = pito.UUID()
+
     const def = WS("/a/b/:c/d", 'WS')
         .params(param)
         .query(query)
@@ -21,6 +23,7 @@ tap.test('builder', async t => {
         .recv(recv)
         .request(req)
         .response(res)
+        .fail(fail)
         .build()
     t.same(
         def.domain,
@@ -50,6 +53,10 @@ tap.test('builder', async t => {
         def.response,
         res
     )
+    t.same(
+        pito.strict(def.fail),
+        pito.strict(fail),
+    )
 })
 
 tap.test('meta', async t => {
@@ -57,6 +64,7 @@ tap.test('meta', async t => {
     const summary = randomBytes(10).toString('hex')
     const url = `http://www.${randomBytes(2).toString('hex')}.com`
     const urlDesc = randomBytes(10).toString('hex')
+
     const def = WS("/a/b/c/d")
         .description(description)
         .summary(summary)

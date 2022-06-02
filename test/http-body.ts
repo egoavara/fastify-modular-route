@@ -13,6 +13,7 @@ tap.test('builder', async t => {
     })
     const body = pito.Str()
     const res = pito.Int()
+    const fail = pito.UUID()
 
 
     const def = HTTPBody("POST", "/a/b/:c/d", 'Test')
@@ -20,6 +21,7 @@ tap.test('builder', async t => {
         .query(query)
         .body(body)
         .response(res)
+        .fail(fail)
         .build()
 
     t.same(
@@ -41,6 +43,10 @@ tap.test('builder', async t => {
     t.same(
         pito.strict(def.response),
         pito.strict(res),
+    )
+    t.same(
+        pito.strict(def.fail),
+        pito.strict(fail),
     )
 })
 

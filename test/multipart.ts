@@ -12,12 +12,13 @@ tap.test('builder', async t => {
         c: pito.Num()
     })
     const res = pito.Int()
-
+    const fail = pito.UUID()
 
     const def = Multipart("/a/b/:c/d", 'Test')
         .params(param)
         .query(query)
         .response(res)
+        .fail(fail)
         .build()
 
     t.same(
@@ -35,6 +36,10 @@ tap.test('builder', async t => {
     t.same(
         pito.strict(def.response),
         pito.strict(res),
+    )
+    t.same(
+        pito.strict(def.fail),
+        pito.strict(fail),
     )
 })
 
