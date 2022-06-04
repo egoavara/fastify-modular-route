@@ -23,7 +23,7 @@ export type Route =
     | WS<string, string, string, any, any, any, any, any, any>
 
 export type InferHTTPNoBody<R extends Route> =
-    R extends HTTPNoBody<infer Domain, infer Presets, infer Method, infer Path, infer Params, infer Query, infer Response>
+    R extends HTTPNoBody<infer Domain, infer Presets, infer Method, infer Path, infer Params, infer Query, infer Response, infer Fail>
     ? {
         Domain: Domain
         Presets: Presets
@@ -32,11 +32,12 @@ export type InferHTTPNoBody<R extends Route> =
         Params: Params
         Query: Query
         Response: Response
+        Fail :Fail
     }
     : never
 
 export type InferHTTPBody<R extends Route> =
-    R extends HTTPBody<infer Domain, infer Presets, infer Method, infer Path, infer Params, infer Query, infer Body, infer Response>
+    R extends HTTPBody<infer Domain, infer Presets, infer Method, infer Path, infer Params, infer Query, infer Body, infer Response, infer Fail>
     ? {
         Domain: Domain
         Presets: Presets
@@ -46,11 +47,12 @@ export type InferHTTPBody<R extends Route> =
         Query: Query
         Body: Body
         Response: Response
+        Fail :Fail
     }
     : never
 
 export type InferMultipart<R extends Route> =
-    R extends Multipart<infer Domain, infer Presets, infer Path, infer Params, infer Query, infer Response>
+    R extends Multipart<infer Domain, infer Presets, infer Path, infer Params, infer Query, infer Response, infer Fail>
     ? {
         Domain: Domain
         Presets: Presets
@@ -58,10 +60,11 @@ export type InferMultipart<R extends Route> =
         Params: Params
         Query: Query
         Response: Response
+        Fail :Fail
     }
     : never
 export type InferSSE<R extends Route> =
-    R extends SSE<infer Domain, infer Presets, infer Path, infer Params, infer Query, infer Packet>
+    R extends SSE<infer Domain, infer Presets, infer Path, infer Params, infer Query, infer Packet, infer Fail>
     ? {
         Domain: Domain
         Presets: Presets
@@ -69,11 +72,12 @@ export type InferSSE<R extends Route> =
         Params: Params
         Query: Query
         Packet: Packet
+        Fail :Fail
     }
     : never
 
 export type InferWS<R extends Route> =
-    R extends WS<infer Domain, infer Presets, infer Path, infer Params, infer Query, infer Send, infer Recv, infer Request, infer Response>
+    R extends WS<infer Domain, infer Presets, infer Path, infer Params, infer Query, infer Send, infer Recv, infer Request, infer Response, infer Fail>
     ? {
         Domain: Domain
         Presets: Presets
@@ -84,6 +88,7 @@ export type InferWS<R extends Route> =
         Recv: Recv
         Request: Request
         Response: Response
+        Fail :Fail
     }
     : never
 export type InferCommons<R extends Route> =
