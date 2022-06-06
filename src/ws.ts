@@ -61,38 +61,57 @@ export type WSBuilder
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : WSBuilder<Domain, Presets, Path, NewParams, Query, Send, Recv, Request, Response, Fail>
-
         query
             <NewQuery extends pito>
             (query: NewQuery)
             : WSBuilder<Domain, Presets, Path, Params, NewQuery, Send, Recv, Request, Response, Fail>
-
         send
             <NewSend extends pito>
             (send: NewSend)
             : WSBuilder<Domain, Presets, Path, Params, Query, NewSend, Recv, Request, Response, Fail>
-
         recv
             <NewRecv extends pito>
             (recv: NewRecv)
             : WSBuilder<Domain, Presets, Path, Params, Query, Send, NewRecv, Request, Response, Fail>
-
         request
             <NewRequest extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
             (request: NewRequest)
             : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, NewRequest, Response, Fail>
-
         response
             <NewResponse extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
             (response: NewResponse)
             : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, NewResponse, Fail>
-
-        response
-            <NewResponse extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
-            (response: NewResponse)
-            : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, NewResponse, Fail>
-
         fail
+            <NewFail extends pito>
+            (fail: NewFail)
+            : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response, NewFail>
+        // withs
+        withPresets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): WSBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Send, Recv, Request, Response, Fail>
+        withParams
+            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            (params: NewParams)
+            : WSBuilder<Domain, Presets, Path, NewParams, Query, Send, Recv, Request, Response, Fail>
+        withQuery
+            <NewQuery extends pito>
+            (query: NewQuery)
+            : WSBuilder<Domain, Presets, Path, Params, NewQuery, Send, Recv, Request, Response, Fail>
+        withSend
+            <NewSend extends pito>
+            (send: NewSend)
+            : WSBuilder<Domain, Presets, Path, Params, Query, NewSend, Recv, Request, Response, Fail>
+        withRecv
+            <NewRecv extends pito>
+            (recv: NewRecv)
+            : WSBuilder<Domain, Presets, Path, Params, Query, Send, NewRecv, Request, Response, Fail>
+        withRequest
+            <NewRequest extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
+            (request: NewRequest)
+            : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, NewRequest, Response, Fail>
+        withResponse
+            <NewResponse extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
+            (response: NewResponse)
+            : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, NewResponse, Fail>
+        withFail
             <NewFail extends pito>
             (fail: NewFail)
             : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response, NewFail>
@@ -132,6 +151,8 @@ export function WS
         fail: pito.Any(),
     }
     return {
+        // ==================================================
+        // shorts
         // @ts-expect-error
         presets(...presets) {
             target.presets.push(...presets)
@@ -183,8 +204,48 @@ export function WS
             target.fail = fail as any
             return this as any
         },
+        // ==================================================
+        // withs
 
+        withPresets(...presets) {
+            target.presets.push(...presets)
+            return this
+        },
+        withParams(params) {
+            target.params = params as any
+            return this as any
+        },
 
+        withQuery(query) {
+            target.query = query as any
+            return this as any
+        },
+
+        withRecv(recv) {
+            target.recv = recv as any
+            return this as any
+        },
+
+        withSend(send) {
+            target.send = send as any
+            return this as any
+        },
+
+        withRequest(request) {
+            target.request = request as any
+            return this as any
+        },
+
+        withResponse(response) {
+            target.response = response as any
+            return this as any
+        },
+
+        withFail(fail) {
+            target.fail = fail as any
+            return this as any
+        },
+        // ==================================================
         // @ts-expect-error
         build() {
             target.presets = Array.from(new Set([...target.presets, 'ws']))

@@ -61,6 +61,24 @@ export type HTTPNoBodyBuilder
             <NewFail extends pito>
             (fail: NewFail)
             : HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, Query, Response, NewFail>
+        // withs
+        withPresets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): HTTPNoBodyBuilder<Domain, Presets | NewPresets[number], Method, Path, Params, Query, Response, Fail>
+        withParams
+            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            (params: NewParams)
+            : HTTPNoBodyBuilder<Domain, Presets, Method, Path, NewParams, Query, Response, Fail>
+        withQuery
+            <NewQuery extends pito.Obj<Record<string, pito>>>
+            (query: NewQuery)
+            : HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, NewQuery, Response, Fail>
+        withResponse
+            <NewResponse extends pito>
+            (response: NewResponse)
+            : HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, Query, NewResponse, Fail>
+        withFail
+            <NewFail extends pito>
+            (fail: NewFail)
+            : HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, Query, Response, NewFail>
         build(): HTTPNoBody<Domain, 'http' | Presets, Method, Path, Params, Query, Response, Fail>
     }
 export function HTTPNoBody
@@ -91,6 +109,8 @@ export function HTTPNoBody
         fail: pito.Any()
     }
     return {
+        // ==================================================
+        // short
         // @ts-expect-error
         presets(...presets) {
             target.presets.push(...presets)
@@ -124,6 +144,29 @@ export function HTTPNoBody
             target.fail = fail
             return this as any
         },
+        // ==================================================
+        // withs
+        withPresets(...presets) {
+            target.presets.push(...presets)
+            return this
+        },
+        withParams(params) {
+            target.params = params as any
+            return this as any
+        },
+        withQuery(query) {
+            target.query = query as any
+            return this as any
+        },
+        withResponse(response) {
+            target.response = response as any
+            return this as any
+        },
+        withFail(fail) {
+            target.fail = fail
+            return this as any
+        },
+        // ==================================================
         // @ts-expect-error
         build() {
             target.presets = Array.from(new Set([...target.presets, 'http']))

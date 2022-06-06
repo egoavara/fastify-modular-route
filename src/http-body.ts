@@ -48,7 +48,6 @@ export type HTTPBodyBuilder
         summary(contents: string): HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, Body, Response, Fail>
         externalDocs(url: string, description?: string): HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, Body, Response, Fail>
         // 
-
         params
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
@@ -65,12 +64,33 @@ export type HTTPBodyBuilder
             <NewResponse extends pito>
             (response: NewResponse)
             : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, Body, NewResponse, Fail>
-
         fail
             <NewFail extends pito>
             (fail: NewFail)
             : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, Body, Response, NewFail>
-
+        //
+        withParams
+            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            (params: NewParams)
+            : HTTPBodyBuilder<Domain, Presets, Method, Path, NewParams, Query, Body, Response, Fail>
+        withQuery
+            <NewQuery extends pito.Obj<Record<string, pito>>>
+            (query: NewQuery)
+            : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, NewQuery, Body, Response, Fail>
+        withBody
+            <NewBody extends pito>
+            (body: NewBody)
+            : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, NewBody, Response, Fail>
+        withResponse
+            <NewResponse extends pito>
+            (response: NewResponse)
+            : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, Body, NewResponse, Fail>
+        withFail
+            <NewFail extends pito>
+            (fail: NewFail)
+            : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, Body, Response, NewFail>
+        withPresets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): HTTPBodyBuilder<Domain, Presets | NewPresets[number], Method, Path, Params, Query, Body, Response, Fail>
+        //
         build(): HTTPBody<Domain, Presets, Method, Path, Params, Query, Body, Response, Fail>
     }
 
@@ -105,6 +125,8 @@ export function HTTPBody
         fail: pito.Any(),
     }
     return {
+        // ==================================================
+        // short
         // @ts-expect-error
         presets(...presets) {
             target.presets.push(...presets)
@@ -142,6 +164,34 @@ export function HTTPBody
             target.fail = fail as any
             return this as any
         },
+        // ==================================================
+        // withs
+        withPresets(...presets) {
+            target.presets.push(...presets)
+            return this
+        },
+        withParams(params) {
+            target.params = params as any
+            return this as any
+        },
+        withQuery(query: any) {
+            target.query = query as any
+            return this as any
+        },
+        withBody(body: any) {
+            target.body = body as any
+            return this as any
+        },
+        withResponse(response: any) {
+            target.response = response as any
+            return this as any
+        },
+        withFail(fail) {
+            target.fail = fail as any
+            return this as any
+        },
+        // ==================================================
+        // build
         // @ts-expect-error
         build() {
             target.presets = Array.from(new Set(['http', ...target.presets]))
