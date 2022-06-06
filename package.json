@@ -26,7 +26,7 @@
     "watch:esm": "rimraf \"esm/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc --watch -p ./esm/tsconfig.json",
     "test": "tap --node-arg=\"--loader\" --node-arg=\"ts-node/esm\"",
     "postversion": "npm publish",
-    "prepack": "npm run build && npm run test",
+    "prepack": "npm run build",
     "prepublish": "cross-var \"git tag -a \\\"v$npm_package_version\\\" -m \\\"version $npm_package_version\\\"\""
   },
   "keywords": [
