@@ -9,6 +9,7 @@ import { WS } from './ws.js'
 export * from './http-body.js'
 export * from './http-nobody.js'
 export * from './methods.js'
+export * from './modular-event.js'
 export * from './multipart.js'
 export * from './preset.js'
 export * from './sse.js'
@@ -32,7 +33,7 @@ export type InferHTTPNoBody<R extends Route> =
         Params: Params
         Query: Query
         Response: Response
-        Fail :Fail
+        Fail: Fail
     }
     : never
 
@@ -47,7 +48,7 @@ export type InferHTTPBody<R extends Route> =
         Query: Query
         Body: Body
         Response: Response
-        Fail :Fail
+        Fail: Fail
     }
     : never
 
@@ -60,7 +61,7 @@ export type InferMultipart<R extends Route> =
         Params: Params
         Query: Query
         Response: Response
-        Fail :Fail
+        Fail: Fail
     }
     : never
 export type InferSSE<R extends Route> =
@@ -72,7 +73,7 @@ export type InferSSE<R extends Route> =
         Params: Params
         Query: Query
         Packet: Packet
-        Fail :Fail
+        Fail: Fail
     }
     : never
 
@@ -88,7 +89,7 @@ export type InferWS<R extends Route> =
         Recv: Recv
         Request: Request
         Response: Response
-        Fail :Fail
+        Fail: Fail
     }
     : never
 export type InferCommons<R extends Route> =

@@ -20,22 +20,21 @@ export type WS
     // 
     > = {
         readonly domain: Domain
-        presets: Presets[]
-        description?: string
-        summary?: string
-        externalDocs?: { url: string, description?: string }
+        readonly presets: Presets[]
+        readonly description?: string
+        readonly summary?: string
+        readonly externalDocs?: { url: string, description?: string }
 
         readonly method: MethodWS,
         readonly path: Path,
 
-        params: Params,
-        query: Query,
-        send: Send,
-        recv: Recv,
-        request: Request,
-        response: Response,
-        fail: Fail
-        // 
+        readonly params: Params,
+        readonly query: Query,
+        readonly send: Send,
+        readonly recv: Recv,
+        readonly request: Request,
+        readonly response: Response,
+        readonly fail: Fail
     }
 
 export type WSBuilder
@@ -51,12 +50,13 @@ export type WSBuilder
         Response extends Record<string, { args: [...pito[]], return: pito }>,
         Fail extends pito,
     > = {
+        // metadata
         presets<NewPresets extends KnownPresets>(preset: NewPresets): WSBuilder<Domain, Presets | NewPresets, Path, Params, Query, Send, Recv, Request, Response, Fail>
         presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): WSBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Send, Recv, Request, Response, Fail>
         description(contents: string): WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response, Fail>
         summary(contents: string): WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response, Fail>
         externalDocs(url: string, description?: string): WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response, Fail>
-        // 
+        // arguments
         params
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
@@ -115,6 +115,7 @@ export type WSBuilder
             <NewFail extends pito>
             (fail: NewFail)
             : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response, NewFail>
+        // build
         build(): WS<Domain, 'ws' | Presets, Path, Params, Query, Send, Recv, Request, Response, Fail>
     }
 
@@ -135,13 +136,11 @@ export function WS
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
-    const target: WS<Domain, string, Path, pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>, pito.Any, pito.Any, pito.Any, {}, {}> = {
-        // @ts-expect-error
+    const target: any = {
         domain: domain ?? '',
         method: 'WS',
         presets: ['ws'],
         path: path,
-        // @ts-expect-error
         params: pito.Obj(params),
         query: pito.Any(),
         send: pito.Any(),
@@ -152,7 +151,7 @@ export function WS
     }
     return {
         // ==================================================
-        // shorts
+        // metadata
         // @ts-expect-error
         presets(...presets) {
             target.presets.push(...presets)
@@ -170,43 +169,38 @@ export function WS
             target.externalDocs = { url, ...(description !== undefined ? { description } : {}) }
             return this
         },
+        // ==================================================
+        // arguments
         params(params) {
             target.params = params as any
             return this as any
         },
-
         query(query) {
             target.query = query as any
             return this as any
         },
-
         recv(recv) {
             target.recv = recv as any
             return this as any
         },
-
         send(send) {
             target.send = send as any
             return this as any
         },
-
         request(request) {
             target.request = request as any
             return this as any
         },
-
         response(response) {
             target.response = response as any
             return this as any
         },
-
         fail(fail) {
             target.fail = fail as any
             return this as any
         },
         // ==================================================
         // withs
-
         withPresets(...presets) {
             target.presets.push(...presets)
             return this
@@ -215,38 +209,32 @@ export function WS
             target.params = params as any
             return this as any
         },
-
         withQuery(query) {
             target.query = query as any
             return this as any
         },
-
         withRecv(recv) {
             target.recv = recv as any
             return this as any
         },
-
         withSend(send) {
             target.send = send as any
             return this as any
         },
-
         withRequest(request) {
             target.request = request as any
             return this as any
         },
-
         withResponse(response) {
             target.response = response as any
             return this as any
         },
-
         withFail(fail) {
             target.fail = fail as any
             return this as any
         },
         // ==================================================
-        // @ts-expect-error
+        // build
         build() {
             target.presets = Array.from(new Set([...target.presets, 'ws']))
             return target

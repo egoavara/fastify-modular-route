@@ -16,18 +16,18 @@ export type HTTPBody
         Fail extends pito = pito.Any
     > = {
         readonly domain: Domain
-        presets: Presets[]
-        description?: string
-        summary?: string
-        externalDocs?: { url: string, description?: string }
+        readonly presets: Presets[]
+        readonly description?: string
+        readonly summary?: string
+        readonly externalDocs?: { url: string, description?: string }
         // 
         readonly method: Method,
         readonly path: Path,
-        params: Params,
-        query: Query,
-        body: Body,
-        response: Response,
-        fail: Fail,
+        readonly params: Params,
+        readonly query: Query,
+        readonly body: Body,
+        readonly response: Response,
+        readonly fail: Fail,
     }
 
 export type HTTPBodyBuilder
@@ -111,13 +111,11 @@ export function HTTPBody
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
-    const target: HTTPBody<Domain, string, Method, Path, pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>, pito.Any, pito.Any, pito.Any> = {
-        // @ts-expect-error
+    const target: any = {
         domain: domain ?? '',
         method: method,
         presets: ['http'],
         path: path,
-        // @ts-expect-error
         params: pito.Obj(params),
         query: pito.Any(),
         body: pito.Any(),
@@ -192,7 +190,6 @@ export function HTTPBody
         },
         // ==================================================
         // build
-        // @ts-expect-error
         build() {
             target.presets = Array.from(new Set(['http', ...target.presets]))
             return target

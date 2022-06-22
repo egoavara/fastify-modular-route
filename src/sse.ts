@@ -15,17 +15,17 @@ export type SSE
         Fail extends pito = pito.Any,
     > = {
         readonly domain: Domain
-        presets: Presets[]
-        description?: string
-        summary?: string
-        externalDocs?: { url: string, description?: string }
+        readonly presets: Presets[]
+        readonly description?: string
+        readonly summary?: string
+        readonly externalDocs?: { url: string, description?: string }
 
         readonly method: MethodSSE,
         readonly path: Path,
-        params: Params,
-        query: Query,
-        packet: Packet,
-        fail: Fail,
+        readonly params: Params,
+        readonly query: Query,
+        readonly packet: Packet,
+        readonly fail: Fail,
     }
 
 export type SSEBuilder
@@ -39,12 +39,13 @@ export type SSEBuilder
         Packet extends pito,
         Fail extends pito,
     > = {
+        // metadata
         presets<NewPresets extends KnownPresets>(preset: NewPresets): SSEBuilder<Domain, Presets | NewPresets, Path, Params, Query, Packet, Fail>
         presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): SSEBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Packet, Fail>
         description(contents: string): SSEBuilder<Domain, Presets, Path, Params, Query, Packet, Fail>
         summary(contents: string): SSEBuilder<Domain, Presets, Path, Params, Query, Packet, Fail>
         externalDocs(url: string, description?: string): SSEBuilder<Domain, Presets, Path, Params, Query, Packet, Fail>
-        // 
+        // arguments
         params
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
@@ -63,7 +64,6 @@ export type SSEBuilder
             : SSEBuilder<Domain, Presets, Path, Params, Query, Packet, NewFail>
         // withs
         withPresets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): SSEBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Packet, Fail>
-
         withParams
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
@@ -80,6 +80,7 @@ export type SSEBuilder
             <NewFail extends pito>
             (fail: NewFail)
             : SSEBuilder<Domain, Presets, Path, Params, Query, Packet, NewFail>
+        // build
         build(): SSE<Domain, 'http' | 'sse' | Presets, Path, Params, Query, Packet, Fail>
     }
 
@@ -97,13 +98,11 @@ export function SSE
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
-    const target: SSE<Domain, string, Path, pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>, pito.Any, pito.Any> = {
-        // @ts-expect-error
+    const target: any = {
         domain: domain ?? '',
         method: 'SSE',
         presets: ['http', 'sse'],
         path: path,
-        // @ts-expect-error
         params: pito.Obj(params),
         query: pito.Any(),
         packet: pito.Any(),
@@ -111,7 +110,7 @@ export function SSE
     }
     return {
         // ==================================================
-        // shorts
+        // metadata
         // @ts-expect-error
         presets(...presets) {
             target.presets.push(...presets)
@@ -129,6 +128,8 @@ export function SSE
             target.externalDocs = { url, ...(description !== undefined ? { description } : {}) }
             return this
         },
+        // ==================================================
+        // arguments
         params(params) {
             target.params = params as any
             return this as any
@@ -168,7 +169,7 @@ export function SSE
             return this as any
         },
         // ==================================================
-        // @ts-expect-error
+        // build
         build() {
             target.presets = Array.from(new Set([...target.presets, 'http', 'sse']))
             return target

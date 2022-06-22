@@ -23,17 +23,16 @@ export type Multipart
         Fail extends pito = pito.Any,
     > = {
         readonly domain: Domain
-        presets: Presets[]
-        description?: string
-        summary?: string
-        externalDocs?: { url: string, description?: string }
-
+        readonly presets: Presets[]
+        readonly description?: string
+        readonly summary?: string
+        readonly externalDocs?: { url: string, description?: string }
         readonly method: 'MULTIPART',
         readonly path: Path,
-        params: Params,
-        query: Query,
-        response: Response,
-        fail: Fail,
+        readonly params: Params,
+        readonly query: Query,
+        readonly response: Response,
+        readonly fail: Fail,
     }
 
 export type MultipartBuilder
@@ -47,12 +46,13 @@ export type MultipartBuilder
         Response extends pito,
         Fail extends pito,
     > = {
+        // metadata
         presets<NewPresets extends KnownPresets>(preset: NewPresets): MultipartBuilder<Domain, Presets | NewPresets, Path, Params, Query, Response, Fail>
         presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): MultipartBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Response, Fail>
         description(contents: string): MultipartBuilder<Domain, Presets, Path, Params, Query, Response, Fail>
         summary(contents: string): MultipartBuilder<Domain, Presets, Path, Params, Query, Response, Fail>
         externalDocs(url: string, description?: string): MultipartBuilder<Domain, Presets, Path, Params, Query, Response, Fail>
-        // 
+        // arguments
         params
             <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
@@ -87,7 +87,7 @@ export type MultipartBuilder
             <NewFail extends pito>
             (fail: NewFail)
             : MultipartBuilder<Domain, Presets, Path, Params, Query, Response, NewFail>
-        //
+        // build
         build(): Multipart<Domain, 'http' | 'multipart' | Presets, Path, Params, Query, Response, Fail>
     }
 export function Multipart
@@ -104,13 +104,11 @@ export function Multipart
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
-    const target: Multipart<Domain, string, Path, pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>, pito.Any, pito.Any> = {
-        // @ts-expect-error
+    const target: any = {
         domain: domain ?? '',
         method: 'MULTIPART',
         presets: ['http', 'multipart'],
         path: path,
-        // @ts-expect-error
         params: pito.Obj(params),
         query: pito.Any(),
         response: pito.Any(),
@@ -175,7 +173,7 @@ export function Multipart
             return this as any
         },
         // ==================================================
-        // @ts-expect-error
+        // build
         build() {
             target.presets = Array.from(new Set([...target.presets, 'http', 'multipart']))
             return target
