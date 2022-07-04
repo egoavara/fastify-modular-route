@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto'
 import { pito } from 'pito'
 import tap from 'tap'
-import { ModularEvent } from '../cjs'
+import { Share } from '../cjs'
 
 
 tap.test('builder', async t => {
@@ -10,7 +10,7 @@ tap.test('builder', async t => {
     })
 
 
-    const def = ModularEvent("test.hello", 'Test')
+    const def = Share("test.hello", 'Test')
         .payload(payload)
         .build()
 
@@ -22,24 +22,24 @@ tap.test('meta', async t => {
     const summary = randomBytes(10).toString('hex')
     const url = `http://www.${randomBytes(2).toString('hex')}.com`
     const urlDesc = randomBytes(10).toString('hex')
-    const def = ModularEvent("test.hello", 'Test')
+    const def = Share("test.hello", 'Test')
         .description(description)
         .summary(summary)
         .build()
 
     t.same(def.description, description)
     t.same(def.summary, summary)
-    t.same(ModularEvent("test.hello", 'Test').externalDocs(url).build().externalDocs, { url: url })
-    t.same(ModularEvent("test.hello", 'Test').externalDocs(url, urlDesc).build().externalDocs, { url: url, description: urlDesc })
+    t.same(Share("test.hello", 'Test').externalDocs(url).build().externalDocs, { url: url })
+    t.same(Share("test.hello", 'Test').externalDocs(url, urlDesc).build().externalDocs, { url: url, description: urlDesc })
 })
 
 tap.test('builder no param', async t => {
-    const def = ModularEvent("test.hello", "Test").build()
+    const def = Share("test.hello", "Test").build()
 
     t.same(def.domain, 'Test')
     t.same(def.topic, 'test.hello')
 })
 
 tap.test('constraint', async t => {
-    t.throws(() => { ModularEvent('test/hello') })
+    t.throws(() => { Share('test/hello') })
 })

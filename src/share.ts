@@ -1,6 +1,6 @@
 import { pito } from "pito"
 
-export type ModularEvent<Domain extends string, Topic extends string, Payload extends pito> = {
+export type Share<Domain extends string, Topic extends string, Payload extends pito> = {
     readonly domain: Domain
     readonly description?: string
     readonly summary?: string
@@ -8,17 +8,17 @@ export type ModularEvent<Domain extends string, Topic extends string, Payload ex
     readonly topic: Topic
     readonly payload: Payload
 }
-export type ModularEventBuilder<Domain extends string, Topic extends string, Payload extends pito> = {
+export type ShareBuilder<Domain extends string, Topic extends string, Payload extends pito> = {
     // metadata
-    description(contents: string): ModularEventBuilder<Domain, Topic, Payload>
-    summary(contents: string): ModularEventBuilder<Domain, Topic, Payload>
-    externalDocs(url: string, description?: string): ModularEventBuilder<Domain, Topic, Payload>
+    description(contents: string): ShareBuilder<Domain, Topic, Payload>
+    summary(contents: string): ShareBuilder<Domain, Topic, Payload>
+    externalDocs(url: string, description?: string): ShareBuilder<Domain, Topic, Payload>
     // arguments
-    payload<NewPayload extends pito>(newPayload: NewPayload): ModularEventBuilder<Domain, Topic, NewPayload>
+    payload<NewPayload extends pito>(newPayload: NewPayload): ShareBuilder<Domain, Topic, NewPayload>
     // build
-    build(): ModularEvent<Domain, Topic, Payload>
+    build(): Share<Domain, Topic, Payload>
 }
-export function ModularEvent<Topic extends string, Domain extends string = ''>(topic: Topic, domain?: Domain): ModularEventBuilder<Domain, Topic, pito.Any> {
+export function Share<Topic extends string, Domain extends string = ''>(topic: Topic, domain?: Domain): ShareBuilder<Domain, Topic, pito.Any> {
     if(topic.match(/[^0-9a-zA-Z_\.\-]/) !== null){
         throw new Error(`ModularEvent(${topic}, ...) not allowed topic, topic must not contains other than ascii alphabet, ascii numeric, '.', '_', '-'`)
     }
