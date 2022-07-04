@@ -4,19 +4,17 @@ specifiers:
   '@types/node': ^17.0.33
   '@types/tap': ^15.0.6
   cross-var: ^1.1.0
-  pito: ^0.1.2
+  pito: ^0.2.0
   rimraf: ^3.0.2
   tap: ^16.0.1
   ts-node: ^10.7.0
   typescript: ^4.6.3
 
-dependencies:
-  pito: 0.1.3
-
 devDependencies:
   '@types/node': 17.0.33
   '@types/tap': 15.0.7
   cross-var: 1.1.0
+  pito: 0.2.0
   rimraf: 3.0.2
   tap: 16.2.0_v73b3xgw6ydytm4gxrazwris7i
   ts-node: 10.7.0_2e3zkt3gzqz6r43dj4x46rot3i
@@ -1932,9 +1930,9 @@ packages:
     engines: {node: '>=8.6'}
     dev: true
 
-  /pito/0.1.3:
-    resolution: {integrity: sha512-KxTZEpurpZj7+kpaeYic3lniDb8w0pViSShQA+kysuEW986kDJ/Pk6SUTBEWZjnhjKM8YO55JzvSG9Ltfru0uw==}
-    dev: false
+  /pito/0.2.0:
+    resolution: {integrity: sha512-9L5qE+E02i/gGtNaIaU1rynWdUPWXFMzu1v5DYddSZT5YldKN3N5bc00efIP43korGaeEfzP03dCrzTbhp+qJQ==}
+    dev: true
 
   /pkg-dir/4.2.0:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
