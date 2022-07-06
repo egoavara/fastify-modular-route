@@ -3,6 +3,7 @@ import { HTTPBody } from './http-body.js'
 import { HTTPNoBody } from './http-nobody.js'
 import { MethodHTTPBody, MethodHTTPNoBody } from './methods.js'
 import { Multipart } from './multipart.js'
+import { Share } from './share.js'
 import { SSE } from './sse.js'
 import { WS } from './ws.js'
 
@@ -22,6 +23,7 @@ export type Route =
     | Multipart<string, string, string, any, any, any>
     | SSE<string, string, string, any, any, any>
     | WS<string, string, string, any, any, any, any, any, any>
+    | Share<string, string, any>
 
 export type InferHTTPNoBody<R extends Route> =
     R extends HTTPNoBody<infer Domain, infer Presets, infer Method, infer Path, infer Params, infer Query, infer Response, infer Fail>
