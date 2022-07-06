@@ -62,24 +62,6 @@ export type SSEBuilder
             <NewFail extends pito>
             (fail: NewFail)
             : SSEBuilder<Domain, Presets, Path, Params, Query, Packet, NewFail>
-        // withs
-        withPresets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): SSEBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Packet, Fail>
-        withParams
-            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
-            (params: NewParams)
-            : SSEBuilder<Domain, Presets, Path, NewParams, Query, Packet, Fail>
-        withQuery
-            <NewQuery extends pito>
-            (query: NewQuery)
-            : SSEBuilder<Domain, Presets, Path, Params, NewQuery, Packet, Fail>
-        withPacket
-            <NewPacket extends pito>
-            (packet: NewPacket)
-            : SSEBuilder<Domain, Presets, Path, Params, Query, NewPacket, Fail>
-        withFail
-            <NewFail extends pito>
-            (fail: NewFail)
-            : SSEBuilder<Domain, Presets, Path, Params, Query, Packet, NewFail>
         // build
         build(): SSE<Domain, 'http' | 'sse' | Presets, Path, Params, Query, Packet, Fail>
     }
@@ -143,28 +125,6 @@ export function SSE
             return this as any
         },
         fail(fail) {
-            target.fail = fail as any
-            return this as any
-        },
-        // ==================================================
-        // withs
-        withPresets(...presets) {
-            target.presets.push(...presets)
-            return this
-        },
-        withParams(params) {
-            target.params = params as any
-            return this as any
-        },
-        withQuery(query) {
-            target.query = query as any
-            return this as any
-        },
-        withPacket(packet) {
-            target.packet = packet as any
-            return this as any
-        },
-        withFail(fail) {
             target.fail = fail as any
             return this as any
         },

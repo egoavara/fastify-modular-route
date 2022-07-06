@@ -69,24 +69,6 @@ export type MultipartBuilder
             <NewFail extends pito>
             (fail: NewFail)
             : MultipartBuilder<Domain, Presets, Path, Params, Query, Response, NewFail>
-        // withs
-        withPresets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): MultipartBuilder<Domain, Presets | NewPresets[number], Path, Params, Query, Response, Fail>
-        withParams
-            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
-            (params: NewParams)
-            : MultipartBuilder<Domain, Presets, Path, NewParams, Query, Response, Fail>
-        withQuery
-            <NewQuery extends pito.Obj<Record<string, pito>>>
-            (query: NewQuery)
-            : MultipartBuilder<Domain, Presets, Path, Params, NewQuery, Response, Fail>
-        withResponse
-            <NewResponse extends pito>
-            (response: NewResponse)
-            : MultipartBuilder<Domain, Presets, Path, Params, Query, NewResponse, Fail>
-        withFail
-            <NewFail extends pito>
-            (fail: NewFail)
-            : MultipartBuilder<Domain, Presets, Path, Params, Query, Response, NewFail>
         // build
         build(): Multipart<Domain, 'http' | 'multipart' | Presets, Path, Params, Query, Response, Fail>
     }
@@ -147,28 +129,6 @@ export function Multipart
             return this as any
         },
         fail(fail) {
-            target.fail = fail as any
-            return this as any
-        },
-        // ==================================================
-        // withs
-        withPresets(...presets) {
-            target.presets.push(...presets)
-            return this
-        },
-        withParams(params) {
-            target.params = params as any
-            return this as any
-        },
-        withQuery(query) {
-            target.query = query as any
-            return this as any
-        },
-        withResponse(response) {
-            target.response = response as any
-            return this as any
-        },
-        withFail(fail) {
             target.fail = fail as any
             return this as any
         },
