@@ -32,5 +32,5 @@ export function intoRegexTopic(topic: string): RegExp {
         }
     })
     
-    return new RegExp(parts.join('\\.'))
+    return new RegExp('^' + parts.join('\\.') + '$')
 }
