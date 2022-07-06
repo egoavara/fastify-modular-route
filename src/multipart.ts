@@ -1,6 +1,6 @@
 import { pito } from "pito"
 import { KnownPresets, AnyPresets } from "./preset.js"
-import { ParseRouteKeys } from "./utils.js"
+import { ParseRouteKeysForPath } from "./utils.js"
 
 export type LimitFile = {
     fieldNameSize?: number,  // Max field name size in bytes
@@ -17,7 +17,7 @@ export type Multipart
         Presets extends AnyPresets,
 
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito = pito,
         Response extends pito = pito.Any,
         Fail extends pito = pito.Any,
@@ -41,7 +41,7 @@ export type MultipartBuilder
         Presets extends AnyPresets,
         Path extends string,
 
-        Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito,
         Response extends pito,
         Fail extends pito,
@@ -54,7 +54,7 @@ export type MultipartBuilder
         externalDocs(url: string, description?: string): MultipartBuilder<Domain, Presets, Path, Params, Query, Response, Fail>
         // arguments
         params
-            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : MultipartBuilder<Domain, Presets, Path, NewParams, Query, Response, Fail>
         query
@@ -79,7 +79,7 @@ export function Multipart
         Domain,
         'http' | 'multipart',
         Path,
-        pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number, any, any, any>>>,
+        pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number, any, any, any>>>,
         pito.Any,
         pito.Any,
         pito.Any

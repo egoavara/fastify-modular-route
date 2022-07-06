@@ -5,6 +5,7 @@ import { MethodHTTPBody, MethodHTTPNoBody } from './methods.js'
 import { Multipart } from './multipart.js'
 import { Share } from './share.js'
 import { SSE } from './sse.js'
+import { PathToTopic } from './utils.js'
 import { WS } from './ws.js'
 
 export * from './http-body.js'
@@ -23,7 +24,7 @@ export type Route =
     | Multipart<string, any, string, any, any, any>
     | SSE<string, any, string, any, any, any>
     | WS<string, any, string, any, any, any, any, any, any>
-    | Share<string, any, string, any>
+    | Share<string, any, string, any, any>
 
 export type InferHTTPNoBody<R extends Route> =
     R extends HTTPNoBody<infer Domain, infer Presets, infer Method, infer Path, infer Params, infer Query, infer Response, infer Fail>
@@ -97,11 +98,13 @@ export type InferWS<R extends Route> =
     : never
 
 export type InferShare<R extends Route> =
-    R extends Share<infer Domain, infer Presets, infer Topic, infer Payload>
+    R extends Share<infer Domain, infer Presets, infer Path, infer Params, infer Payload>
     ? {
         Domain: Domain
         Presets: Presets
-        Topic: Topic
+        Path: Path
+        Topic: PathToTopic<Path>
+        Params: Params
         Payload: Payload
     }
     : never
@@ -137,7 +140,7 @@ export type InferCommons<R extends Route> =
         Presets: Presets
         Method: 'WS'
     }
-    : R extends Share<infer Domain, infer Presets, any, any>
+    : R extends Share<infer Domain, infer Presets, any, any, any>
     ? {
         Domain: Domain
         Presets: Presets
@@ -156,7 +159,7 @@ export type InferPresets<R extends Route> =
     ? Presets
     : R extends WS<string, infer Presets, any, any, any, any, any, any, any>
     ? Presets
-    : R extends Share<string, infer Presets, any, any>
+    : R extends Share<string, infer Presets, any, any, any>
     ? Presets
     : never
 

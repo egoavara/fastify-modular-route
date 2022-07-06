@@ -1,7 +1,7 @@
 import { pito } from "pito"
 import { MethodWS } from "./methods.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
-import { ParseRouteKeys } from "./utils.js"
+import { ParseRouteKeysForPath } from "./utils.js"
 
 
 export type WS
@@ -10,7 +10,7 @@ export type WS
         Presets extends AnyPresets,
         Path extends string,
 
-        Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito = pito,
         Send extends pito = pito,
         Recv extends pito = pito,
@@ -42,7 +42,7 @@ export type WSBuilder
         Domain extends string,
         Presets extends AnyPresets,
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito,
         Send extends pito,
         Recv extends pito,
@@ -58,7 +58,7 @@ export type WSBuilder
         externalDocs(url: string, description?: string): WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response, Fail>
         // arguments
         params
-            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : WSBuilder<Domain, Presets, Path, NewParams, Query, Send, Recv, Request, Response, Fail>
         query
@@ -97,7 +97,7 @@ export function WS
         Domain,
         'ws',
         Path,
-        pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number, any, any, any>>>,
+        pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number, any, any, any>>>,
         pito.Any,
         pito.Any,
         pito.Any,

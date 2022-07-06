@@ -1,6 +1,8 @@
 {
   "include": ["src/**/*.ts"],
   "compilerOptions": {
+    "target": "esnext",
+    "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

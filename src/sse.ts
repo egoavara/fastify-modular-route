@@ -1,7 +1,7 @@
 import { pito } from "pito"
 import { MethodSSE } from "./methods.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
-import { ParseRouteKeys } from "./utils.js"
+import { ParseRouteKeysForPath } from "./utils.js"
 
 
 export type SSE
@@ -9,7 +9,7 @@ export type SSE
         Domain extends string,
         Presets extends AnyPresets,
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito = pito,
         Packet extends pito = pito,
         Fail extends pito = pito.Any,
@@ -34,7 +34,7 @@ export type SSEBuilder
         Presets extends AnyPresets,
 
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito,
         Packet extends pito,
         Fail extends pito,
@@ -47,7 +47,7 @@ export type SSEBuilder
         externalDocs(url: string, description?: string): SSEBuilder<Domain, Presets, Path, Params, Query, Packet, Fail>
         // arguments
         params
-            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : SSEBuilder<Domain, Presets, Path, NewParams, Query, Packet, Fail>
         query
@@ -73,7 +73,7 @@ export function SSE
         Domain,
         'http' | 'sse',
         Path,
-        pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         pito.Any,
         pito.Any,
         pito.Any

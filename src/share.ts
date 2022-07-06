@@ -1,37 +1,45 @@
 import { pito } from "pito"
 import { AnyPresets, KnownPresets } from "./preset.js"
+import { ParseRouteKeysForPath, PathToTopic } from "./utils.js"
 
-export type Share<Domain extends string, Presets extends AnyPresets, Topic extends string, Payload extends pito> = {
+export type Share<Domain extends string, Presets extends AnyPresets, Path extends string, Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>, Payload extends pito> = {
     readonly method: 'SHARE'
     readonly domain: Domain
     readonly presets: Presets[]
     readonly description?: string
     readonly summary?: string
     readonly externalDocs?: { url: string, description?: string }
-    readonly topic: Topic
+    readonly path: Path
+    readonly topic: PathToTopic<Path>
+    readonly params: Params
     readonly payload: Payload
 }
-export type ShareBuilder<Domain extends string, Presets extends AnyPresets, Topic extends string, Payload extends pito> = {
+export type ShareBuilder<Domain extends string, Presets extends AnyPresets, Path extends string, Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>, Payload extends pito> = {
     // metadata
-    presets<NewPresets extends KnownPresets>(preset: NewPresets): ShareBuilder<Domain, Presets | NewPresets, Topic, Payload>
-    presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): ShareBuilder<Domain, Presets | NewPresets[number], Topic, Payload>
-    description(contents: string): ShareBuilder<Domain, Presets, Topic, Payload>
-    summary(contents: string): ShareBuilder<Domain, Presets, Topic, Payload>
-    externalDocs(url: string, description?: string): ShareBuilder<Domain, Presets, Topic, Payload>
+    presets<NewPresets extends KnownPresets>(preset: NewPresets): ShareBuilder<Domain, Presets | NewPresets, Path, Params, Payload>
+    presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): ShareBuilder<Domain, Presets | NewPresets[number], Path, Params, Payload>
+    description(contents: string): ShareBuilder<Domain, Presets, Path, Params, Payload>
+    summary(contents: string): ShareBuilder<Domain, Presets, Path, Params, Payload>
+    externalDocs(url: string, description?: string): ShareBuilder<Domain, Presets, Path, Params, Payload>
     // arguments
-    payload<NewPayload extends pito>(newPayload: NewPayload): ShareBuilder<Domain, Presets, Topic, NewPayload>
+    params
+        <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
+        (params: NewParams)
+        : ShareBuilder<Domain, Presets, Path, NewParams, Payload>
+    payload<NewPayload extends pito>(newPayload: NewPayload): ShareBuilder<Domain, Presets, Path, Params, NewPayload>
     // build
-    build(): Share<Domain, Presets, Topic, Payload>
+    build(): Share<Domain, Presets, Path, Params, Payload>
 }
-export function Share<Topic extends string, Domain extends string = ''>(topic: Topic, domain?: Domain): ShareBuilder<Domain, 'share', Topic, pito.Any> {
-    if (topic.match(/[^0-9a-zA-Z_\.\-]/) !== null) {
-        throw new Error(`ModularEvent(${topic}, ...) not allowed topic, topic must not contains other than ascii alphabet, ascii numeric, '.', '_', '-'`)
-    }
+export function Share<Path extends string, Domain extends string = ''>(path: Path, domain?: Domain): ShareBuilder<Domain, 'share', Path, pito.Obj<Record<ParseRouteKeysForPath<Path>, pito.Str>>, pito.Any> {
+    const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
+    const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
     const result: any = {
         method: 'SHARE',
         domain: domain ?? '',
         presets: ['share'],
-        topic,
+        path: path,
+        topic: PathToTopic(path),
+        params: pito.Obj(params),
         payload: pito.Any() as pito
     }
     return {
@@ -51,6 +59,10 @@ export function Share<Topic extends string, Domain extends string = ''>(topic: T
         externalDocs(url, description?) {
             result.externalDocs = { url, ...(description !== undefined ? { description } : {}) }
             return this
+        },
+        params(params) {
+            result.params = params as any
+            return this as any
         },
         payload(newPayload) {
             result.payload = newPayload

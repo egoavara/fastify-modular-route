@@ -1,7 +1,7 @@
 import { pito } from "pito"
 import { MethodHTTPBody } from "./methods.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
-import { ParseRouteKeys } from "./utils.js"
+import { ParseRouteKeysForPath } from "./utils.js"
 
 export type HTTPBody
     <
@@ -9,7 +9,7 @@ export type HTTPBody
         Presets extends AnyPresets,
         Method extends MethodHTTPBody,
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito = pito.Any,
         Body extends pito = pito.Any,
         Response extends pito = pito.Any,
@@ -36,7 +36,7 @@ export type HTTPBodyBuilder
         Presets extends AnyPresets,
         Method extends MethodHTTPBody,
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito,
         Body extends pito,
         Response extends pito,
@@ -49,7 +49,7 @@ export type HTTPBodyBuilder
         externalDocs(url: string, description?: string): HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, Body, Response, Fail>
         // 
         params
-            <NewParams extends pito.Obj<Record<ParseRouteKeys<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : HTTPBodyBuilder<Domain, Presets, Method, Path, NewParams, Query, Body, Response, Fail>
         query
@@ -79,7 +79,7 @@ export function HTTPBody
         'http',
         Method,
         Path,
-        pito.Obj<Record<ParseRouteKeys<Path>, pito.Str>>,
+        pito.Obj<Record<ParseRouteKeysForPath<Path>, pito.Str>>,
         pito.Any,
         pito.Any,
         pito.Any,
