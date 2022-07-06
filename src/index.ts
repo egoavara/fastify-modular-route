@@ -18,12 +18,12 @@ export * from './utils.js'
 export * from './ws.js'
 
 export type Route =
-    | HTTPBody<string, string, MethodHTTPBody, any, any, any, any, any>
-    | HTTPNoBody<string, string, MethodHTTPNoBody, any, any, any, any>
-    | Multipart<string, string, string, any, any, any>
-    | SSE<string, string, string, any, any, any>
-    | WS<string, string, string, any, any, any, any, any, any>
-    | Share<string, string, any>
+    | HTTPBody<string, any, MethodHTTPBody, any, any, any, any, any>
+    | HTTPNoBody<string, any, MethodHTTPNoBody, any, any, any, any>
+    | Multipart<string, any, string, any, any, any>
+    | SSE<string, any, string, any, any, any>
+    | WS<string, any, string, any, any, any, any, any, any>
+    | Share<string, any, string, any>
 
 export type InferHTTPNoBody<R extends Route> =
     R extends HTTPNoBody<infer Domain, infer Presets, infer Method, infer Path, infer Params, infer Query, infer Response, infer Fail>
@@ -66,6 +66,7 @@ export type InferMultipart<R extends Route> =
         Fail: Fail
     }
     : never
+
 export type InferSSE<R extends Route> =
     R extends SSE<infer Domain, infer Presets, infer Path, infer Params, infer Query, infer Packet, infer Fail>
     ? {
@@ -94,49 +95,69 @@ export type InferWS<R extends Route> =
         Fail: Fail
     }
     : never
-export type InferCommons<R extends Route> =
-    R extends HTTPBody<infer Domain, infer Prefix, infer Method, any, any, any, any, any>
+
+export type InferShare<R extends Route> =
+    R extends Share<infer Domain, infer Presets, infer Topic, infer Payload>
     ? {
         Domain: Domain
-        Prefix: Prefix
-        Method: Method
-    }
-    : R extends HTTPNoBody<infer Domain, infer Prefix, infer Method, any, any, any, any>
-    ? {
-        Domain: Domain
-        Prefix: Prefix
-        Method: Method
-    }
-    : R extends Multipart<infer Domain, infer Prefix, any, any, any, any>
-    ? {
-        Domain: Domain
-        Prefix: Prefix
-        Method: 'MULTIPART'
-    }
-    : R extends SSE<infer Domain, infer Prefix, any, any, any, any>
-    ? {
-        Domain: Domain
-        Prefix: Prefix
-        Method: 'SSE'
-    }
-    : R extends WS<infer Domain, infer Prefix, any, any, any, any, any, any, any>
-    ? {
-        Domain: Domain
-        Prefix: Prefix
-        Method: 'WS'
+        Presets: Presets
+        Topic: Topic
+        Payload: Payload
     }
     : never
-export type InferPrefix<R extends Route> =
-    R extends HTTPBody<string, infer Prefix, MethodHTTPBody, any, any, any, any, any>
-    ? Prefix
-    : R extends HTTPNoBody<string, infer Prefix, MethodHTTPNoBody, any, any, any, any>
-    ? Prefix
-    : R extends Multipart<string, infer Prefix, any, any, any, any>
-    ? Prefix
-    : R extends SSE<string, infer Prefix, any, any, any, any>
-    ? Prefix
-    : R extends WS<string, infer Prefix, any, any, any, any, any, any, any>
-    ? Prefix
+
+export type InferCommons<R extends Route> =
+    R extends HTTPBody<infer Domain, infer Presets, infer Method, any, any, any, any, any>
+    ? {
+        Domain: Domain
+        Presets: Presets
+        Method: Method
+    }
+    : R extends HTTPNoBody<infer Domain, infer Presets, infer Method, any, any, any, any>
+    ? {
+        Domain: Domain
+        Presets: Presets
+        Method: Method
+    }
+    : R extends Multipart<infer Domain, infer Presets, any, any, any, any>
+    ? {
+        Domain: Domain
+        Presets: Presets
+        Method: 'MULTIPART'
+    }
+    : R extends SSE<infer Domain, infer Presets, any, any, any, any>
+    ? {
+        Domain: Domain
+        Presets: Presets
+        Method: 'SSE'
+    }
+    : R extends WS<infer Domain, infer Presets, any, any, any, any, any, any, any>
+    ? {
+        Domain: Domain
+        Presets: Presets
+        Method: 'WS'
+    }
+    : R extends Share<infer Domain, infer Presets, any, any>
+    ? {
+        Domain: Domain
+        Presets: Presets
+        Method: 'SHARE'
+    }
+    : never
+
+export type InferPresets<R extends Route> =
+    R extends HTTPBody<string, infer Presets, MethodHTTPBody, any, any, any, any, any>
+    ? Presets
+    : R extends HTTPNoBody<string, infer Presets, MethodHTTPNoBody, any, any, any, any>
+    ? Presets
+    : R extends Multipart<string, infer Presets, any, any, any, any>
+    ? Presets
+    : R extends SSE<string, infer Presets, any, any, any, any>
+    ? Presets
+    : R extends WS<string, infer Presets, any, any, any, any, any, any, any>
+    ? Presets
+    : R extends Share<string, infer Presets, any, any>
+    ? Presets
     : never
 
 export function func<Caller extends Record<string, { args: [pito] | [...pito[]], return: pito }>>(caller: Caller): Caller {
