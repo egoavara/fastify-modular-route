@@ -9,6 +9,10 @@ export type Share<Domain extends string, Presets extends AnyPresets, Path extend
     readonly description?: string
     readonly summary?: string
     readonly externalDocs?: { url: string, description?: string }
+    // 
+    readonly partitions: number
+    readonly replication: number
+    // 
     readonly path: Path
     readonly topic: PathToTopic<Path>
     readonly params: Params
@@ -21,6 +25,21 @@ export type ShareBuilder<Domain extends string, Presets extends AnyPresets, Path
     description(contents: string): ShareBuilder<Domain, Presets, Path, Params, Payload>
     summary(contents: string): ShareBuilder<Domain, Presets, Path, Params, Payload>
     externalDocs(url: string, description?: string): ShareBuilder<Domain, Presets, Path, Params, Payload>
+    /**
+     * > [!] Operates only when possible
+     * @param partitions
+     * default num partitions
+     * - default = 1
+     * 
+    */
+    partition(partitions?: number): ShareBuilder<Domain, Presets, Path, Params, Payload>
+    /**
+     * > [!] Operates only when possible
+     * @param replication
+     * default replication factor
+     * - default = 2
+    */
+    replication(replication?: number): ShareBuilder<Domain, Presets, Path, Params, Payload>
     // arguments
     params
         <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
@@ -37,6 +56,8 @@ export function Share<Path extends string, Domain extends string = ''>(path: Pat
         method: 'SHARE',
         domain: domain ?? '',
         presets: ['share'],
+        partitions: 1,
+        replication: 2,
         path: path,
         topic: PathToTopic(path),
         params: pito.Obj(params),
@@ -58,6 +79,20 @@ export function Share<Path extends string, Domain extends string = ''>(path: Pat
         },
         externalDocs(url, description?) {
             result.externalDocs = { url, ...(description !== undefined ? { description } : {}) }
+            return this
+        },
+        partition(partitions) {
+            if(partitions!== undefined && (partitions < 1)){
+                throw new Error(`partitions not allow negative`)
+            }
+            result.partitions = partitions ?? 1
+            return this
+        },
+        replication(replication) {
+            if(replication!== undefined && (replication < 1)){
+                throw new Error(`replication not allow negative`)
+            }
+            result.replication = replication ?? 2
             return this
         },
         params(params) {
