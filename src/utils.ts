@@ -23,16 +23,16 @@ export function PathToTopic<Path extends string>(path: Path): PathToTopic<Path> 
     const temp = path.replaceAll('/', '.').replace(/^./, '')
     return temp as PathToTopic<Path>
 }
-export function intoRegexTopic(topic: string, option?:{namedRegex?:boolean}): RegExp {
+export function intoRegexTopic(topic: string, option?: { namedRegex?: boolean }): RegExp {
     const namedRegex = option?.namedRegex ?? true
-    const parts = topic.split('.').map(v=>{
-        if(v.startsWith(':')){
-            if(namedRegex){
+    const parts = topic.split('.').map(v => {
+        if (v.startsWith(':')) {
+            if (namedRegex) {
                 return `(?<${v.substring(1)}>[a-zA-Z0-9_\-]+)`
-            }else{
+            } else {
                 return `([a-zA-Z0-9_\-]+)`
             }
-        }else{
+        } else {
             return v
         }
     })

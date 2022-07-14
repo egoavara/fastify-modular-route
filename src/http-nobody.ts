@@ -1,6 +1,6 @@
 import { pito } from "pito"
 import { MethodHTTPNoBody } from "./methods.js"
-import { KnownPresets, AnyPresets } from "./preset.js"
+import { AnyPresets, KnownPresets } from "./preset.js"
 import { ParseRouteKeysForPath } from "./utils.js"
 
 export type HTTPNoBody
