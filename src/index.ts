@@ -20,11 +20,11 @@ export * from './utils.js'
 export * from './ws.js'
 
 export type Route =
-    | HTTPBody<string, any, MethodHTTPBody, any, any, any, any, any>
-    | HTTPNoBody<string, any, MethodHTTPNoBody, any, any, any, any>
-    | Multipart<string, any, string, any, any, any>
-    | SSE<string, any, string, any, any, any>
-    | WS<string, any, string, any, any, any, any, any, any>
+    | HTTPBody<string, any, MethodHTTPBody, any, any, any, any, any, any>
+    | HTTPNoBody<string, any, MethodHTTPNoBody, any, any, any, any, any>
+    | Multipart<string, any, string, any, any, any, any>
+    | SSE<string, any, string, any, any, any, any, any>
+    | WS<string, any, string, any, any, any, any, any, any, any>
     | Share<string, any, string, any, any>
 
 export type InferHTTPNoBody<R extends Route> =
@@ -70,7 +70,7 @@ export type InferMultipart<R extends Route> =
     : never
 
 export type InferSSE<R extends Route> =
-    R extends SSE<infer Domain, infer Presets, infer Path, infer Params, infer Query, infer Packet, infer Fail>
+    R extends SSE<infer Domain, infer Presets, infer Path, infer Params, infer Query, infer Packet, infer Events, infer Fail>
     ? {
         Domain: Domain
         Presets: Presets
@@ -78,6 +78,7 @@ export type InferSSE<R extends Route> =
         Params: Params
         Query: Query
         Packet: Packet
+        Events: Events
         Fail: Fail
     }
     : never
@@ -129,7 +130,7 @@ export type InferCommons<R extends Route> =
         Presets: Presets
         Method: 'MULTIPART'
     }
-    : R extends SSE<infer Domain, infer Presets, any, any, any, any>
+    : R extends SSE<infer Domain, infer Presets, any, any, any, any, any>
     ? {
         Domain: Domain
         Presets: Presets
@@ -156,7 +157,7 @@ export type InferPresets<R extends Route> =
     ? Presets
     : R extends Multipart<string, infer Presets, any, any, any, any>
     ? Presets
-    : R extends SSE<string, infer Presets, any, any, any, any>
+    : R extends SSE<string, infer Presets, any, any, any, any, any>
     ? Presets
     : R extends WS<string, infer Presets, any, any, any, any, any, any, any>
     ? Presets
