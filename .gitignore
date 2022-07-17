@@ -9,7 +9,7 @@ node_modules/
 .npm
 
 
-
+# typescript compiler
 cjs/**/*.d.ts
 cjs/**/*.d.ts.map
 cjs/**/*.js
@@ -21,3 +21,7 @@ esm/**/*.d.ts.map
 esm/**/*.js
 esm/**/*.js.map
 esm/*.tsbuildinfo
+
+types/**/*.d.ts
+types/**/*.d.ts.map
+types/*.tsbuildinfo

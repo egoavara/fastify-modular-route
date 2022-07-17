@@ -1,12 +1,14 @@
 {
-  "name": "fastify-modular-route",
+  "name": "@fastify-modular/route",
   "version": "0.7.1",
   "description": "route template for fastify-modular ",
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
+  "types": "./types/index.d.ts",
   "exports": {
     ".": {
       "import": "./esm/index.js",
+      "types": "./types/index.d.ts",
       "require": "./cjs/index.js"
     }
   },
@@ -19,15 +21,11 @@
     "esm/package.json"
   ],
   "scripts": {
-    "build": "npm run build:cjs & npm run build:esm",
-    "build:cjs": "rimraf \"cjs/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -p ./cjs/tsconfig.json",
-    "build:esm": "rimraf \"esm/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -p ./esm/tsconfig.json",
-    "watch:cjs": "rimraf \"cjs/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc --watch -p ./cjs/tsconfig.json",
-    "watch:esm": "rimraf \"esm/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc --watch -p ./esm/tsconfig.json",
+    "build": "rimraf \"{cjs,esm,types}/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -b ./cjs/tsconfig.json ./esm/tsconfig.json ./types/tsconfig.json --watch",
+    "watch": "rimraf \"{cjs,esm,types}/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -b ./cjs/tsconfig.json ./esm/tsconfig.json ./types/tsconfig.json --watch",
     "test": "tap --ts",
-    "postversion": "npm publish",
-    "prepack": "npm run build",
-    "prepublish": "cross-var \"git tag -a \\\"v$npm_package_version\\\" -m \\\"version $npm_package_version\\\"\""
+    "postversion": "npm publish --access=public",
+    "prepack": "npm run build"
   },
   "keywords": [
     "typescript",

@@ -3,30 +3,11 @@
     "tasks": [
         {
             "label": "watch",
-            "dependsOrder": "parallel",
-            "dependsOn" :[
-                "watch:cjs",
-                "watch:esm"
-            ],
+            "type": "npm",
+            "script": "watch",
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
-        },
-        {
-            "label": "watch:cjs",
-            "type": "npm",
-            "script": "watch:cjs",
-            "group": {
-                "kind": "build",
-            }
-        },
-        {
-            "label": "watch:esm",
-            "type": "npm",
-            "script": "watch:esm",
-            "group": {
-                "kind": "build",
             }
         },
         {
