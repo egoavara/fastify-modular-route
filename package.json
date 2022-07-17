@@ -21,7 +21,7 @@
     "esm/package.json"
   ],
   "scripts": {
-    "build": "rimraf \"{cjs,esm,types}/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -b ./cjs/tsconfig.json ./esm/tsconfig.json ./types/tsconfig.json --watch",
+    "build": "rimraf \"{cjs,esm,types}/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -b ./cjs/tsconfig.json ./esm/tsconfig.json ./types/tsconfig.json",
     "watch": "rimraf \"{cjs,esm,types}/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -b ./cjs/tsconfig.json ./esm/tsconfig.json ./types/tsconfig.json --watch",
     "test": "tap --ts",
     "postversion": "npm publish --access=public",
