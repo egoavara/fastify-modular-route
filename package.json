@@ -13,12 +13,11 @@
     }
   },
   "files": [
-    "cjs/**/*.d.ts",
     "cjs/**/*.js",
     "cjs/package.json",
-    "esm/**/*.d.ts",
     "esm/**/*.js",
-    "esm/package.json"
+    "esm/package.json",
+    "types/**/*.d.ts"
   ],
   "scripts": {
     "build": "rimraf \"{cjs,esm,types}/**/*.{js,js.map,d.ts,d.ts.map}\" && tsc -b ./cjs/tsconfig.json ./esm/tsconfig.json ./types/tsconfig.json",
