@@ -25,3 +25,7 @@ esm/*.tsbuildinfo
 types/**/*.d.ts
 types/**/*.d.ts.map
 types/*.tsbuildinfo
+
+
+# macos
+.DS_Store
