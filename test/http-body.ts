@@ -5,10 +5,10 @@ import { HTTPBody } from '../cjs'
 
 
 tap.test('builder', async t => {
-    const query = pito.Obj({
+    const query = PitoObj({
         Q: pito.Num()
     })
-    const param = pito.Obj({
+    const param = PitoObj({
         c: pito.Num()
     })
     const body = pito.Str()

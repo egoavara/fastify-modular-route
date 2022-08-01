@@ -1,8 +1,8 @@
-import { pito } from "pito"
+import { pito, PitoAny, PitoObj, PitoStr } from "pito"
 import { AnyPresets, KnownPresets } from "./preset.js"
 import { ParseRouteKeysForPath, PathToTopic } from "./utils.js"
 
-export type Share<Domain extends string, Presets extends AnyPresets, Path extends string, Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>, Payload extends pito> = {
+export type Share<Domain extends string, Presets extends AnyPresets, Path extends string, Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>, Payload extends pito> = {
     readonly method: 'SHARE'
     readonly domain: Domain
     readonly presets: Presets[]
@@ -15,7 +15,7 @@ export type Share<Domain extends string, Presets extends AnyPresets, Path extend
     readonly params: Params
     readonly payload: Payload
 }
-export type ShareBuilder<Domain extends string, Presets extends AnyPresets, Path extends string, Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>, Payload extends pito> = {
+export type ShareBuilder<Domain extends string, Presets extends AnyPresets, Path extends string, Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>, Payload extends pito> = {
     // metadata
     presets<NewPresets extends KnownPresets>(preset: NewPresets): ShareBuilder<Domain, Presets | NewPresets, Path, Params, Payload>
     presets<NewPresets extends [AnyPresets] | [...AnyPresets[]]>(...presets: NewPresets): ShareBuilder<Domain, Presets | NewPresets[number], Path, Params, Payload>
@@ -24,14 +24,14 @@ export type ShareBuilder<Domain extends string, Presets extends AnyPresets, Path
     externalDocs(url: string, description?: string): ShareBuilder<Domain, Presets, Path, Params, Payload>
     // arguments
     params
-        <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
+        <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
         (params: NewParams)
         : ShareBuilder<Domain, Presets, Path, NewParams, Payload>
     payload<NewPayload extends pito>(newPayload: NewPayload): ShareBuilder<Domain, Presets, Path, Params, NewPayload>
     // build
     build(): Share<Domain, Presets, Path, Params, Payload>
 }
-export function Share<Path extends string, Domain extends string = ''>(path: Path, domain?: Domain): ShareBuilder<Domain, 'share', Path, pito.Obj<Record<ParseRouteKeysForPath<Path>, pito.Str>>, pito.Any> {
+export function Share<Path extends string, Domain extends string = ''>(path: Path, domain?: Domain): ShareBuilder<Domain, 'share', Path, PitoObj<Record<ParseRouteKeysForPath<Path>, PitoStr>>, PitoAny> {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
     const result: any = {
@@ -40,8 +40,8 @@ export function Share<Path extends string, Domain extends string = ''>(path: Pat
         presets: ['share'],
         path: path,
         topic: PathToTopic(path),
-        params: pito.Obj(params),
-        payload: pito.Any() as pito
+        params: PitoObj(params),
+        payload: PitoAny() as pito
     }
     return {
         // @ts-expect-error

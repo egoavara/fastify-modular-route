@@ -5,7 +5,7 @@ import { Share } from '../cjs'
 
 
 tap.test('builder', async t => {
-    const payload = pito.Obj({
+    const payload = PitoObj({
         c: pito.Num()
     })
 

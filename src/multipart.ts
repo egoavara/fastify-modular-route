@@ -1,4 +1,4 @@
-import { pito } from "pito"
+import { pito, PitoAny, PitoObj } from "pito"
 import { AnyPresets, KnownPresets } from "./preset.js"
 import { ParseRouteKeysForPath } from "./utils.js"
 
@@ -17,10 +17,10 @@ export type Multipart
         Presets extends AnyPresets,
 
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito = pito,
-        Response extends pito = pito.Any,
-        Fail extends pito = pito.Any,
+        Response extends pito = PitoAny,
+        Fail extends pito = PitoAny,
     > = {
         readonly domain: Domain
         readonly presets: Presets[]
@@ -41,7 +41,7 @@ export type MultipartBuilder
         Presets extends AnyPresets,
         Path extends string,
 
-        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito,
         Response extends pito,
         Fail extends pito,
@@ -54,11 +54,11 @@ export type MultipartBuilder
         externalDocs(url: string, description?: string): MultipartBuilder<Domain, Presets, Path, Params, Query, Response, Fail>
         // arguments
         params
-            <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : MultipartBuilder<Domain, Presets, Path, NewParams, Query, Response, Fail>
         query
-            <NewQuery extends pito.Obj<Record<string, pito>>>
+            <NewQuery extends PitoObj<Record<string, pito>>>
             (query: NewQuery)
             : MultipartBuilder<Domain, Presets, Path, Params, NewQuery, Response, Fail>
         response
@@ -79,10 +79,10 @@ export function Multipart
         Domain,
         'http' | 'multipart',
         Path,
-        pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number, any, any, any>>>,
-        pito.Any,
-        pito.Any,
-        pito.Any
+        PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number, any, any, any>>>,
+        PitoAny,
+        PitoAny,
+        PitoAny
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
@@ -91,10 +91,10 @@ export function Multipart
         method: 'MULTIPART',
         presets: ['http', 'multipart'],
         path: path,
-        params: pito.Obj(params),
-        query: pito.Any(),
-        response: pito.Any(),
-        fail: pito.Any(),
+        params: PitoObj(params),
+        query: PitoAny(),
+        response: PitoAny(),
+        fail: PitoAny(),
     }
     return {
         // ==================================================

@@ -1,4 +1,4 @@
-import { pito } from "pito"
+import { Pito, pito, PitoAny, PitoObj } from "pito"
 import { MethodWS } from "./methods.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
 import { ParseRouteKeysForPath } from "./utils.js"
@@ -10,7 +10,7 @@ export type WS
         Presets extends AnyPresets,
         Path extends string,
 
-        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito = pito,
         Send extends pito = pito,
         Recv extends pito = pito,
@@ -42,7 +42,7 @@ export type WSBuilder
         Domain extends string,
         Presets extends AnyPresets,
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito,
         Send extends pito,
         Recv extends pito,
@@ -58,7 +58,7 @@ export type WSBuilder
         externalDocs(url: string, description?: string): WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, Response, Fail>
         // arguments
         params
-            <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : WSBuilder<Domain, Presets, Path, NewParams, Query, Send, Recv, Request, Response, Fail>
         query
@@ -97,13 +97,13 @@ export function WS
         Domain,
         'ws',
         Path,
-        pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number, any, any, any>>>,
-        pito.Any,
-        pito.Any,
-        pito.Any,
+        PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number, any, any, any>>>,
+        PitoAny,
+        PitoAny,
+        PitoAny,
         {},
         {},
-        pito.Any
+        PitoAny
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
@@ -112,13 +112,13 @@ export function WS
         method: 'WS',
         presets: ['ws'],
         path: path,
-        params: pito.Obj(params),
-        query: pito.Any(),
-        send: pito.Any(),
-        recv: pito.Any(),
+        params: PitoObj(params),
+        query: PitoAny(),
+        send: PitoAny(),
+        recv: PitoAny(),
         request: {},
         response: {},
-        fail: pito.Any(),
+        fail: PitoAny(),
     }
     return {
         // ==================================================

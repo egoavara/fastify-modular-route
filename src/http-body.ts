@@ -1,4 +1,4 @@
-import { pito } from "pito"
+import { pito, PitoAny, PitoObj, PitoStr } from "pito"
 import { MethodHTTPBody } from "./methods.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
 import { ParseRouteKeysForPath } from "./utils.js"
@@ -9,11 +9,11 @@ export type HTTPBody
         Presets extends AnyPresets,
         Method extends MethodHTTPBody,
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
-        Query extends pito = pito.Any,
-        Body extends pito = pito.Any,
-        Response extends pito = pito.Any,
-        Fail extends pito = pito.Any
+        Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
+        Query extends pito = PitoAny,
+        Body extends pito = PitoAny,
+        Response extends pito = PitoAny,
+        Fail extends pito = PitoAny
     > = {
         readonly domain: Domain
         readonly presets: Presets[]
@@ -36,7 +36,7 @@ export type HTTPBodyBuilder
         Presets extends AnyPresets,
         Method extends MethodHTTPBody,
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito,
         Body extends pito,
         Response extends pito,
@@ -49,11 +49,11 @@ export type HTTPBodyBuilder
         externalDocs(url: string, description?: string): HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, Body, Response, Fail>
         // 
         params
-            <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : HTTPBodyBuilder<Domain, Presets, Method, Path, NewParams, Query, Body, Response, Fail>
         query
-            <NewQuery extends pito.Obj<Record<string, pito>>>
+            <NewQuery extends PitoObj<Record<string, pito>>>
             (query: NewQuery)
             : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, NewQuery, Body, Response, Fail>
         body
@@ -79,11 +79,11 @@ export function HTTPBody
         'http',
         Method,
         Path,
-        pito.Obj<Record<ParseRouteKeysForPath<Path>, pito.Str>>,
-        pito.Any,
-        pito.Any,
-        pito.Any,
-        pito.Any
+        PitoObj<Record<ParseRouteKeysForPath<Path>, PitoStr>>,
+        PitoAny,
+        PitoAny,
+        PitoAny,
+        PitoAny
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
@@ -92,11 +92,11 @@ export function HTTPBody
         method: method,
         presets: ['http'],
         path: path,
-        params: pito.Obj(params),
-        query: pito.Any(),
-        body: pito.Any(),
-        response: pito.Any(),
-        fail: pito.Any(),
+        params: PitoObj(params),
+        query: PitoAny(),
+        body: PitoAny(),
+        response: PitoAny(),
+        fail: PitoAny(),
     }
     return {
         // ==================================================

@@ -1,4 +1,4 @@
-import { pito } from "pito"
+import { Pito, pito, PitoAny, PitoObj } from "pito"
 import { MethodSSE } from "./methods.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
 import { ParseRouteKeysForPath } from "./utils.js"
@@ -9,11 +9,11 @@ export type SSE
         Domain extends string,
         Presets extends AnyPresets,
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>> = PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito = pito,
         Packet extends pito = pito,
         Events extends Record<string, pito> = {},
-        Fail extends pito = pito.Any,
+        Fail extends pito = PitoAny,
     > = {
         readonly domain: Domain
         readonly presets: Presets[]
@@ -35,7 +35,7 @@ export type SSEBuilder
         Domain extends string,
         Presets extends AnyPresets,
         Path extends string,
-        Params extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
+        Params extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
         Query extends pito,
         Packet extends pito,
         Events extends Record<string, pito>,
@@ -49,7 +49,7 @@ export type SSEBuilder
         externalDocs(url: string, description?: string): SSEBuilder<Domain, Presets, Path, Params, Query, Packet, Events, Fail>
         // arguments
         params
-            <NewParams extends pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
+            <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
             (params: NewParams)
             : SSEBuilder<Domain, Presets, Path, NewParams, Query, Packet, Events, Fail>
         query
@@ -79,11 +79,11 @@ export function SSE
         Domain,
         'http' | 'sse',
         Path,
-        pito.Obj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
-        pito.Any,
-        pito.Any,
+        PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>,
+        PitoAny,
+        PitoAny,
         {},
-        pito.Any
+        PitoAny
     > {
     const paramKeys = path.match(/:[a-zA-Z_\-]+/g)
     const params = Object.fromEntries((paramKeys ?? []).map(v => [v, pito.Str()]))
@@ -92,11 +92,11 @@ export function SSE
         method: 'SSE',
         presets: ['http', 'sse'],
         path: path,
-        params: pito.Obj(params),
-        query: pito.Any(),
-        packet: pito.Any(),
+        params: PitoObj(params),
+        query: PitoAny(),
+        packet: PitoAny(),
         events: {},
-        fail: pito.Any()
+        fail: PitoAny()
     }
     return {
         // ==================================================
