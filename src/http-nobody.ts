@@ -1,7 +1,8 @@
 import { pito, PitoAny, PitoObj } from "pito"
 import { MethodHTTPNoBody } from "./methods.js"
+import { ParamsOption, QueryOption, ResponseOption } from "./options.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
-import { ParseRouteKeysForPath } from "./utils.js"
+import { formatAPI, isObject, ParseRouteKeysForPath } from "./utils.js"
 
 export type HTTPNoBody
     <
@@ -48,15 +49,15 @@ export type HTTPNoBodyBuilder
         // arguments
         params
             <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
-            (params: NewParams)
+            (params: NewParams, option? :ParamsOption)
             : HTTPNoBodyBuilder<Domain, Presets, Method, Path, NewParams, Query, Response, Fail>
         query
-            <NewQuery extends PitoObj<Record<string, pito>>>
-            (query: NewQuery)
+            <NewQuery extends pito>
+            (query: NewQuery, option? :QueryOption)
             : HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, NewQuery, Response, Fail>
         response
             <NewResponse extends pito>
-            (response: NewResponse)
+            (response: NewResponse, option? :ResponseOption)
             : HTTPNoBodyBuilder<Domain, Presets, Method, Path, Params, Query, NewResponse, Fail>
         fail
             <NewFail extends pito>
@@ -114,8 +115,17 @@ export function HTTPNoBody
             target.params = params as any
             return this as any
         },
-        query(query) {
+        query(query, opt) {
             target.query = query as any
+            if (opt?.noCheck === true) {
+                return this as any
+            }
+            if(opt?.allowAny !== true && query.$typeof ==='any'){
+                throw new Error(`${formatAPI(method, path, domain)} : query : not allowed 'any'`)
+            }
+            if(opt?.allowNonObject !== true && !isObject(query)){
+                throw new Error(`${formatAPI(method, path, domain)} : query : not allowed non object type`)
+            }
             return this as any
         },
         response(response) {

@@ -1,3 +1,5 @@
+import { ReflectType } from "pito"
+
 export type ParseRouteKeysForPath<Route extends string> =
     Route extends `/${infer POST}`
     ? ParseRouteKeysForPath<POST>
@@ -38,3 +40,24 @@ export function intoRegexTopic(topic: string, option?: { namedRegex?: boolean })
     })
     return new RegExp('^' + parts.join('\\.') + '$')
 }
+
+export function formatAPI(method: string, path: string, domain?: string): string {
+    if(typeof domain === 'string'){
+        return `${domain} ${method.toUpperCase()} ${path}`
+    }
+    return `${method.toUpperCase()} ${path}`
+}
+
+export function isObject(reflect : ReflectType): boolean{
+    if(reflect.$typeof === 'object'){
+        return true
+    }
+    if(reflect.$typeof === 'union'){
+        return reflect.$args.map(v=>isObject(v)).reduce((curr, val)=>curr && val)
+    }
+    if(reflect.$typeof === 'intersect'){
+        return reflect.$args.map(v=>isObject(v)).reduce((curr, val)=>curr || val)
+    }
+    return false
+}
+

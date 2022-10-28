@@ -1,4 +1,5 @@
 import { pito, PitoAny, PitoObj, PitoStr } from "pito"
+import { ParamsOption } from "./options.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
 import { ParseRouteKeysForPath, PathToTopic } from "./utils.js"
 
@@ -25,7 +26,7 @@ export type ShareBuilder<Domain extends string, Presets extends AnyPresets, Path
     // arguments
     params
         <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
-        (params: NewParams)
+        (params: NewParams, option? :ParamsOption)
         : ShareBuilder<Domain, Presets, Path, NewParams, Payload>
     payload<NewPayload extends pito>(newPayload: NewPayload): ShareBuilder<Domain, Presets, Path, Params, NewPayload>
     // build

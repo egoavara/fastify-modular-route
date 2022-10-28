@@ -1,7 +1,8 @@
 import { pito, PitoAny, PitoObj, PitoStr } from "pito"
 import { MethodHTTPBody } from "./methods.js"
+import { BodyOption, ParamsOption, QueryOption, ResponseOption } from "./options.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
-import { ParseRouteKeysForPath } from "./utils.js"
+import { formatAPI, isObject, ParseRouteKeysForPath } from "./utils.js"
 
 export type HTTPBody
     <
@@ -50,19 +51,19 @@ export type HTTPBodyBuilder
         // 
         params
             <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
-            (params: NewParams)
+            (params: NewParams, option?: ParamsOption)
             : HTTPBodyBuilder<Domain, Presets, Method, Path, NewParams, Query, Body, Response, Fail>
         query
-            <NewQuery extends PitoObj<Record<string, pito>>>
-            (query: NewQuery)
+            <NewQuery extends pito>
+            (query: NewQuery, option?: QueryOption)
             : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, NewQuery, Body, Response, Fail>
         body
             <NewBody extends pito>
-            (body: NewBody)
+            (body: NewBody, option?: BodyOption)
             : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, NewBody, Response, Fail>
         response
             <NewResponse extends pito>
-            (response: NewResponse)
+            (response: NewResponse, option?: ResponseOption)
             : HTTPBodyBuilder<Domain, Presets, Method, Path, Params, Query, Body, NewResponse, Fail>
         fail
             <NewFail extends pito>
@@ -118,20 +119,38 @@ export function HTTPBody
             target.externalDocs = { url, ...(description !== undefined ? { description } : {}) }
             return this
         },
-        params(params) {
+        params(params, opt) {
             target.params = params as any
+            if (opt?.noCheck === true) {
+                return this as any
+            }
             return this as any
         },
-        query(query: any) {
-            target.query = query as any
+        query(query: pito, opt) {
+            target.query = query as pito
+            if (opt?.noCheck === true) {
+                return this as any
+            }
+            if(opt?.allowAny !== true && query.$typeof ==='any'){
+                throw new Error(`${formatAPI(method, path, domain)} : query : not allowed 'any'`)
+            }
+            if(opt?.allowNonObject !== true && !isObject(query)){
+                throw new Error(`${formatAPI(method, path, domain)} : query : not allowed non object type`)
+            }
             return this as any
         },
-        body(body: any) {
+        body(body: any, opt) {
             target.body = body as any
+            if (opt?.noCheck === true) {
+                return this as any
+            }
             return this as any
         },
-        response(response: any) {
+        response(response: any, opt) {
             target.response = response as any
+            if (opt?.noCheck === true) {
+                return this as any
+            }
             return this as any
         },
         fail(fail) {

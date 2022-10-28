@@ -14,6 +14,17 @@
 		},
 	],
 	"settings": {
+		"search.exclude": {
+			"**/.yarn": true,
+			"**/.pnp.*": true
+		},
+		"typescript.enablePromptUseWorkspaceTsdk": true,
+		"typescript.tsdk": "[root]\\.yarn\\sdks\\typescript\\lib",
 		"typescript.preferences.importModuleSpecifierEnding": "js"
+	},
+	"extensions": {
+		"recommendations": [
+			"arcanis.vscode-zipfs"
+		]
 	},
 }

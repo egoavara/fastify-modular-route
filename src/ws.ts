@@ -1,7 +1,8 @@
 import { Pito, pito, PitoAny, PitoObj } from "pito"
 import { MethodWS } from "./methods.js"
+import { ParamsOption, QueryOption, RequestResponseOption, SendReceiveOption } from "./options.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
-import { ParseRouteKeysForPath } from "./utils.js"
+import { formatAPI, isObject, ParseRouteKeysForPath } from "./utils.js"
 
 
 export type WS
@@ -59,27 +60,27 @@ export type WSBuilder
         // arguments
         params
             <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
-            (params: NewParams)
+            (params: NewParams, option?: ParamsOption)
             : WSBuilder<Domain, Presets, Path, NewParams, Query, Send, Recv, Request, Response, Fail>
         query
             <NewQuery extends pito>
-            (query: NewQuery)
+            (query: NewQuery, option?: QueryOption)
             : WSBuilder<Domain, Presets, Path, Params, NewQuery, Send, Recv, Request, Response, Fail>
         send
             <NewSend extends pito>
-            (send: NewSend)
+            (send: NewSend, option?: SendReceiveOption)
             : WSBuilder<Domain, Presets, Path, Params, Query, NewSend, Recv, Request, Response, Fail>
         recv
             <NewRecv extends pito>
-            (recv: NewRecv)
+            (recv: NewRecv, option?: SendReceiveOption)
             : WSBuilder<Domain, Presets, Path, Params, Query, Send, NewRecv, Request, Response, Fail>
         request
             <NewRequest extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
-            (request: NewRequest)
+            (request: NewRequest, option?: RequestResponseOption)
             : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, NewRequest, Response, Fail>
         response
             <NewResponse extends Record<string, { args: [pito] | [...pito[]], return: pito }>>
-            (response: NewResponse)
+            (response: NewResponse, option?: RequestResponseOption)
             : WSBuilder<Domain, Presets, Path, Params, Query, Send, Recv, Request, NewResponse, Fail>
         fail
             <NewFail extends pito>
@@ -146,8 +147,17 @@ export function WS
             target.params = params as any
             return this as any
         },
-        query(query) {
+        query(query, opt) {
             target.query = query as any
+            if (opt?.noCheck === true) {
+                return this as any
+            }
+            if(opt?.allowAny !== true && query.$typeof ==='any'){
+                throw new Error(`${formatAPI("WS", path, domain)} : query : not allowed 'any'`)
+            }
+            if(opt?.allowNonObject !== true && !isObject(query)){
+                throw new Error(`${formatAPI("WS", path, domain)} : query : not allowed non object type`)
+            }
             return this as any
         },
         recv(recv) {

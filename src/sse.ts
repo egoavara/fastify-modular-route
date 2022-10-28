@@ -1,7 +1,8 @@
 import { Pito, pito, PitoAny, PitoObj } from "pito"
 import { MethodSSE } from "./methods.js"
+import { EventOption, PacketOption, ParamsOption, QueryOption } from "./options.js"
 import { AnyPresets, KnownPresets } from "./preset.js"
-import { ParseRouteKeysForPath } from "./utils.js"
+import { formatAPI, isObject, ParseRouteKeysForPath } from "./utils.js"
 
 
 export type SSE
@@ -50,19 +51,19 @@ export type SSEBuilder
         // arguments
         params
             <NewParams extends PitoObj<Record<ParseRouteKeysForPath<Path>, pito<string | number | boolean, any, any, any>>>>
-            (params: NewParams)
+            (params: NewParams, option?: ParamsOption)
             : SSEBuilder<Domain, Presets, Path, NewParams, Query, Packet, Events, Fail>
         query
             <NewQuery extends pito>
-            (query: NewQuery)
+            (query: NewQuery, option?: QueryOption)
             : SSEBuilder<Domain, Presets, Path, Params, NewQuery, Packet, Events, Fail>
         packet
             <NewPacket extends pito>
-            (packet: NewPacket)
+            (packet: NewPacket, option?: PacketOption)
             : SSEBuilder<Domain, Presets, Path, Params, Query, NewPacket, Events, Fail>
         events
             <NewEvents extends Record<string, pito>>
-            (events: NewEvents)
+            (events: NewEvents, option?: EventOption)
             : SSEBuilder<Domain, Presets, Path, Params, Query, Packet, NewEvents, Fail>
         fail
             <NewFail extends pito>
@@ -124,8 +125,17 @@ export function SSE
             target.params = params as any
             return this as any
         },
-        query(query) {
+        query(query, opt) {
             target.query = query as any
+            if (opt?.noCheck === true) {
+                return this as any
+            }
+            if(opt?.allowAny !== true && query.$typeof ==='any'){
+                throw new Error(`${formatAPI("SSE", path, domain)} : query : not allowed 'any'`)
+            }
+            if(opt?.allowNonObject !== true && !isObject(query)){
+                throw new Error(`${formatAPI("SSE", path, domain)} : query : not allowed non object type`)
+            }
             return this as any
         },
         packet(packet) {
